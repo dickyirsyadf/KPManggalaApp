@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mangony App</title>
-    
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables CSS -->
@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="{{asset('assets/compiled/css/app-dark.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/compiled/css/iconly.css')}}">
     <style>
-        
+
             /* Sidebar item with dropdown menu */
         .sidebar-item.dropdown {
             position: relative;
@@ -79,9 +79,20 @@
             color: #fff;
         }
 
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
     </style>
 
-    
+
 
     <meta name="csrf-token" content="{{csrf_token()}}" />
 
@@ -199,14 +210,14 @@
                 }, 250); // 5000 milidetik = 5 detik
             });
     </script>
-    
+
 
     <script src="{{asset('assets/static/js/components/dark.js')}}"></script>
     <script src="{{asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')}}"></script>
 
     <!-- <script src="{{asset('assets/compiled/js/app.js')}}"></script> -->
 
-    
+
 
     <!-- <script src="{{asset('assets/extensions/simple-datatables/umd/simple-datatables.js')}}"></script>
     <script src="{{asset('assets/static/js/pages/simple-datatables.js')}}"></script> -->

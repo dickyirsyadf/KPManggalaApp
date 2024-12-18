@@ -39,7 +39,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Amal Ibadah</th>
+                        <th>Penjualan</th>
                         <th>Tanggal</th>
                         <th>Nominal</th>
                         {{-- <th>Action</th> --}}

@@ -12,13 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('absensis', function (Blueprint $table) {
-            $table->unsignedBigInteger("id_karyawan");
+            $table->id();
+            $table->foreignId('id_karyawan')->constrained('users')->onDelete('cascade');
             $table->date("tanggal");
-            $table->timestamp("masuk");
-            $table->timestamp("pulang");
+            $table->boolean('kehadiran')->default(true);
             $table->timestamps();
-
-            $table->foreign('id_karyawan')->references('id')->on('users');
         });
     }
 

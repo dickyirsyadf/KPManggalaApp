@@ -42,7 +42,7 @@ class KaryawanController extends Controller
 
         return response()->json(['error' => 'HakAkses not found'], 404);
     }
-    
+
     function update(Request $request)
     {
         try {
@@ -80,12 +80,12 @@ class KaryawanController extends Controller
             $User = User::findOrFail($id);
             // Delete the item
             $User->delete();
-    
+
             // Return a success response
             return back()->with('success', 'Hapus User Berhasil !');
         }catch(Exception $e){
             return back()->with('error', 'Hapus User Gagal! Data Tidak Ditemukan');
         }
-        
+
     }
 }

@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Absensi extends Model
 {
     use HasFactory;
-    
-    protected $casts = [
-        'masuk' => 'hh:mm:ss',
-        'pulang' => 'hh:mm:ss'
-    ];
+
+    protected $fillable = ['id_karyawan', 'tanggal', 'kehadiran'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_karyawan');
+    }
 }

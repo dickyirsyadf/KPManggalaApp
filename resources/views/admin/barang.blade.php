@@ -44,7 +44,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -218,13 +218,10 @@
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <!-- Bootstrap JS (Optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
-
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- Bootstrap JS (Optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Mengubah format mata uang rupiah  -->
 <script>
     function formatRupiah(amount) {
@@ -256,7 +253,7 @@
                     data: null,
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-sm btn-primary edit-btn" 
+                            <button class="btn btn-sm btn-primary edit-btn"
                                     data-bs-toggle="modal" data-bs-target="#modal-form-edit"
                                     data-id="${row.id}"
                                     data-nama="${row.nama}"
@@ -265,8 +262,8 @@
                                     data-harga="${row.harga}">
                                 Edit
                             </button>
-                            <button class="btn btn-sm btn-danger delete-btn" 
-                                    data-id="${row.id}" data-bs-toggle="modal" 
+                            <button class="btn btn-sm btn-danger delete-btn"
+                                    data-id="${row.id}" data-bs-toggle="modal"
                                     data-bs-target="#modal-delete">
                                 Delete
                             </button>

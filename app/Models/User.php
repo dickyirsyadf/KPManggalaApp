@@ -40,6 +40,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo(HakAkses::class, 'id_hakakses'); // Correct foreign key
     }
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class);
+    }
+
 
     /**
      * The attributes that should be hidden for serialization.

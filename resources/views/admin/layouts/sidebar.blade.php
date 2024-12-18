@@ -51,7 +51,43 @@
 
                 <hr style=" margin-bottom: -3px">
 
-                <!-- Sidebar item with hover dropdown -->
+                <li class="sidebar-item">
+                    <a href="{{asset('admin/penjualan')}}" class="sidebar-link">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Penjualan</span>
+                    </a>
+                </li>
+                {{-- <li class="sidebar-item">
+                    <a href="{{asset('admin/program')}}" class="sidebar-link">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Pemesanan</span>
+                    </a>
+                </li> --}}
+
+
+                <hr style=" margin-bottom: -3px">
+
+
+                <li class="sidebar-item">
+                    <a href="{{asset('admin/laporan')}}" class="sidebar-link">
+                        <i class="bi bi-files"></i>
+                        <span>Laporan</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="{{asset('admin/penggajian')}}" class="sidebar-link">
+                        <i class="bi bi-file-earmark-image"></i>
+                        <span>Penggajian</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{asset('admin/absensi')}}" class="sidebar-link">
+                        <i class="bi bi-file-earmark-image"></i>
+                        <span>Absensi</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item dropdown">
                     <a href="#" class="sidebar-link">
                         <i class="bi bi-database"></i>
@@ -71,29 +107,6 @@
                             </a>
                         </li>
                     </ul>
-                </li>
-
-                <hr style=" margin-bottom: -3px">
-
-                <li class="sidebar-item">
-                    <a href="{{asset('admin/pengeluaran')}}" class="sidebar-link">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Pengeluaran</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="{{asset('admin/laporan')}}" class="sidebar-link">
-                        <i class="bi bi-files"></i>
-                        <span>Laporan</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="{{asset('admin/penggajian')}}" class="sidebar-link">
-                        <i class="bi bi-file-earmark-image"></i>
-                        <span>Penggajian</span>
-                    </a>
                 </li>
 
                 <li class="sidebar-item">

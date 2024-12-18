@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\http\Controllers\KaryawanController;
+use App\Http\Controllers\PenjualanController;
 // use PDF;
 use Illuminate\Support\Facades\PDF;
 
@@ -50,7 +52,7 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::post('/tambahbarang', 'create');
             Route::post('/barang/edit', 'update')->name('barang.update');
             Route::delete('/barang/{id}','delete')->name('barang.delete');
-            
+
         });
         Route::controller(KaryawanController::class)->group(function () {
             Route::get('karyawan','index');
@@ -59,7 +61,16 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::post('/tambahkaryawan', 'create');
             Route::post('/karyawan/edit', 'update')->name('karyawan.update');
             Route::delete('/karyawan/{id}','delete')->name('karyawan.delete');
-            
+
+        });
+        Route::controller(PenjualanController::class)->group(function (){
+            Route::get('penjualan','index')->name('penjualan');
+        });
+        Route::controller(AbsensiController::class)->group(function () {
+            Route::get('/absensi', 'index')->name('absensi.index');
+            Route::post('/absensi', 'store')->name('absensi.store');
+            Route::put('/absensi/update','update')->name('absensi.update');
+
         });
         Route::controller(AdminController::class)->group(function (){
             Route::get('/dashboard', 'dashboard');
@@ -89,9 +100,6 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::post('/upload', 'upload')->name('upload');
             Route::delete('/hapus', 'destroy')->name('hapus');
 
-            // Route Pengeluaran
-            Route::get('/pengeluaran', 'pengeluaran')->name('pengeluaran');
-            Route::post('/tambahpengeluaran', 'createpengeluaran')->name('tambahpengeluaran');
 
             // Laporan
             Route::get('/laporan', 'laporan');
