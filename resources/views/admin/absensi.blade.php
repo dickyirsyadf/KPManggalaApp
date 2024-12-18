@@ -1,22 +1,23 @@
 @extends('admin.layouts.admin-master')
+
 @section('admin-master')
 <div class="page-heading ">
     <div class="page-title">
         <div class="row">
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item active" aria-current="page">
-                        Absensi
-                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Absensi</li>
                 </ol>
             </nav>
         </div>
     </div>
-</div>
-<div class="page-content">
-    <section class="row">
-        <div class="col-12 ">
-            <h1>User Absensi</h1>
+
+    <section class="section">
+        <div class="card">
+            <div class="card-header">
+                <h1>User Absensi</h1>
+            </div>
+            <div class="card-body">
                 <form action="{{ route('absensi.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
@@ -39,9 +40,7 @@
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="kehadiran" id="kehadiran" checked>
-                        <label class="form-check-label" for="kehadiran">
-                            Present
-                        </label>
+                        <label class="form-check-label" for="kehadiran">Present</label>
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Save</button>
                 </form>
@@ -63,10 +62,12 @@
                                 <td>{{ $absensis->tanggal }}</td>
                                 <td>{{ $absensis->kehadiran == 1 ? 'Present' : 'Absent' }}</td>
                                 <td>
-                                    <!-- Edit button to open modal -->
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal"
+                                    <!-- Edit button -->
+                                    <button class="btn btn-sm btn-primary edit-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modal-form-edit"
                                         data-id="{{ $absensis->id }}"
-                                        data-date="{{ $absensis->tanggal }}"
+                                        data-tanggal="{{ $absensis->tanggal }}"
                                         data-kehadiran="{{ $absensis->kehadiran }}">
                                         Edit
                                     </button>
@@ -75,16 +76,17 @@
                         @endforeach
                     </tbody>
                 </table>
-                @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
             </div>
-        @endif
 
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </section>
 </div>
@@ -97,63 +99,60 @@
                 <div class="modal-title">
                     <h3>Edit Absen</h3>
                     <p class="text-subtitle text-muted">
-                        Masukan Password di akhir untuk mengubah absen.
+                        Enter admin password to authorize the edit.
                     </p>
                 </div>
             </div>
             <form method="POST" action="{{ route('absensi.update') }}">
                 @csrf
+                @method('PUT')
                 <div class="modal-body">
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <!-- Hidden input field for absensi ID -->
-                            <input type="hidden" name="id" id="absensiId">
-                        </div>
+                    <div class="form-group">
+                        <label for="absensiId">Absensi ID</label>
+                        <input type="hidden" name="id" id="absensiId" required>
                     </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <label for="editTanggal" class="form-label">Tanggal</label>
-                            <input type="date" name="tanggal" class="form-control" id="editTanggal" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="editTanggal" class="form-label">Tanggal</label>
+                        <input type="date" name="tanggal" class="form-control" id="editTanggal" required>
                     </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <label for="editKehadiran" class="form-label">Kehadiran</label>
-                            <select name="kehadiran" class="form-select" id="editKehadiran" required>
-                                <option value="1">Present</option>
-                                <option value="0">Absent</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="editKehadiran" class="form-label">Kehadiran</label>
+                        <select name="kehadiran" class="form-select" id="editKehadiran" required>
+                            <option value="1">Present</option>
+                            <option value="0">Absent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword" class="form-label">Admin Password</label>
+                        <input type="password" name="admin_password" class="form-control" id="adminPassword" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                        <i class="bx bx-x d-block d-sm-none"></i>
-                        <span class="d-none d-sm-block">Close</span>
-                    </button>
-                    <button type="submit" class="btn btn-primary ms-1">
-                        Selesai Edit
-                    </button>
+                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
+<!-- Bootstrap JS (Optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // JavaScript to handle data passing to the modal
-    $('#editModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget); // Button that triggered the modal
-    var absensiId = button.data('id');  // Extract data-id from button
-    var tanggal = button.data('date'); // Extract data-date from button
-    var kehadiran = button.data('kehadiran'); // Extract data-kehadiran from button
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-btn');
 
-    var modal = $(this);
-    modal.find('#absensiId').val(absensiId);  // Set the hidden input for absensi ID
-    modal.find('#editTanggal').val(tanggal); // Set the date input field
-    modal.find('#editKehadiran').val(kehadiran); // Set the kehadiran field (select input)
-});
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const absensiId = this.dataset.id;
+                const tanggal = this.dataset.tanggal;
+                const kehadiran = this.dataset.kehadiran;
 
+                document.getElementById('absensiId').value = absensiId;
+                document.getElementById('editTanggal').value = tanggal;
+                document.getElementById('editKehadiran').value = kehadiran;
+            });
+        });
+    });
 </script>
 
 @endsection

@@ -44,6 +44,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Absensi::class);
     }
+    // Relasi dengan model DaftarGaji
+    public function daftarGaji()
+    {
+        return $this->hasMany(DaftarGaji::class);
+    }
 
 
     /**

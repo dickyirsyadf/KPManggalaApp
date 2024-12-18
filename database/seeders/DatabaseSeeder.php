@@ -12,7 +12,6 @@ use App\Models\HakAkses;
 use App\Models\User;
 use App\Models\Jenis_Transaksi;
 use App\Models\Transaksi;
-use App\Models\Muzakki;
 use App\Models\Barang;
 
 
@@ -68,37 +67,14 @@ class DatabaseSeeder extends Seeder
         // Seeder Jenis Transaksi
         Jenis_Transaksi::factory()
             ->state(new Sequence(
-                ['jenis_transaksi' => 'Zakat Maal (Harta)']
+                ['jenis_transaksi' => 'Penjualan']
             ))
             ->create();
         Jenis_Transaksi::factory()
             ->state(new Sequence(
-                ['jenis_transaksi' => 'Zakat Fitrah']
+                ['jenis_transaksi' => 'Penggajian']
             ))
             ->create();
-        Jenis_Transaksi::factory()
-            ->state(new Sequence(
-                ['jenis_transaksi' => 'Zakat Penghasilan']
-            ))
-            ->create();
-        Jenis_Transaksi::factory()
-            ->state(new Sequence(
-                ['jenis_transaksi' => 'Infaq']
-            ))
-            ->create();
-        Jenis_Transaksi::factory()
-            ->state(new Sequence(
-                ['jenis_transaksi' => 'Sedekah']
-            ))
-            ->create();
-        Jenis_Transaksi::factory()
-            ->state(new Sequence(
-                ['jenis_transaksi' => 'Fidyah']
-            ))
-            ->create();
-
-        // Seeder Muzzaki
-        Muzakki::factory(10)->create();
 
         // Seeder Barang
         Barang::factory(50)->create();

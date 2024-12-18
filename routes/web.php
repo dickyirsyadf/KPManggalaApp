@@ -7,6 +7,7 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\http\Controllers\KaryawanController;
+use App\Http\Controllers\PenggajianController;
 use App\Http\Controllers\PenjualanController;
 // use PDF;
 use Illuminate\Support\Facades\PDF;
@@ -72,6 +73,14 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::put('/absensi/update','update')->name('absensi.update');
 
         });
+        Route::controller(PenggajianController::class)->group(function () {
+            Route::get('/penggajian', 'index')->name('penggajian.index');
+            Route::post('/penggajian', 'store')->name('penggajian.store');
+            Route::get('/penggajian/slip/{id}','generateSlip')->name('penggajian.slip');
+            Route::get('/penggajian/getGaji/{id}','getGajiById')->name('penggajian.getGaji');
+
+        });
+
         Route::controller(AdminController::class)->group(function (){
             Route::get('/dashboard', 'dashboard');
             // Transaksi

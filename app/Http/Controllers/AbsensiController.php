@@ -33,23 +33,25 @@ class AbsensiController extends Controller
         ]);
         return redirect()->route('absensi.index')->with('success', 'Absensi saved successfully!');
     }
-    public function update(Request $request)
+        public function update(Request $request)
     {
-        // Validate the request
         $request->validate([
             'id' => 'required|exists:absensis,id',
             'tanggal' => 'required|date',
-            'kehadiran' => 'required|in:0,1',
+            'kehadiran' => 'required|boolean',
+            'admin_password' => 'required',
         ]);
 
-        // Check if the logged-in user has 'admin' role
-        $user = auth()->user(); // Get logged-in user
-        if ($user->hakakses->role !== 'Admin') {
-            return back()->withErrors(['auth' => 'You do not have permission to edit absensi.']);
+        // Find admin user
+        $admin = User::where('id_hakakses', 1)->first(); // Assuming '1' is the admin role ID
+
+        // Validate the admin password
+        if (!$admin || !Hash::check($request->admin_password, $admin->password)) {
+            return redirect()->back()->withErrors(['admin_password' => 'Invalid admin password.']);
         }
 
-        // Find the absensi by id and update
-        $absensi = Absensi::find($request->id);
+        // Update absensi record
+        $absensi = Absensi::findOrFail($request->id);
         $absensi->tanggal = $request->tanggal;
         $absensi->kehadiran = $request->kehadiran;
         $absensi->save();

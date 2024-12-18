@@ -23,7 +23,6 @@ return new class extends Migration
             $table->datetime('tanggal_konfirmasi')->nullable();
             $table->timestamps();
 
-            $table->foreign('id_muzakki')->references('id')->on('data_muzakkis');
             $table->foreign('id_jenis_transaksi')->references('id')->on('jenis_transaksi');
         });
     }

@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('daftar_gajis', function (Blueprint $table) {
-            $table->unsignedBigInteger("id");
+            $table->id();
+            $table->unsignedBigInteger("id_karyawan");
             $table->string("nama");
             $table->string("bagian");
             $table->integer('jumlah_hadir');
@@ -21,6 +22,8 @@ return new class extends Migration
             $table->integer("bonus");
             $table->integer("gaji_bersih");
             $table->timestamps();
+
+            $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
