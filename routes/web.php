@@ -77,7 +77,7 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('/penggajian', 'index')->name('penggajian.index');
             Route::post('/penggajian', 'store')->name('penggajian.store');
             Route::get('/penggajian/slip/{id}','generateSlip')->name('penggajian.slip');
-            Route::get('/penggajian/getGaji/{id}','getGajiById')->name('penggajian.getGaji');
+            Route::get('/penggajian/getGaji/{id}','getGaji')->name('penggajian.getGaji');
 
         });
 

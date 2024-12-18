@@ -30,7 +30,7 @@ class PenggajianController extends Controller
             'gaji_bersih' => 'required|integer',
         ]);
 
-        DaftarGaji::create($request->all());
+        Penggajian::create($request->all());
         return redirect()->route('admin.penggajian')->with('success', 'Data gaji berhasil disimpan!');
     }
     public function getGaji($id)

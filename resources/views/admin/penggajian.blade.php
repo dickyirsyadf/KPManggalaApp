@@ -63,7 +63,7 @@
             if (userId) {
                 // AJAX Request
                 $.ajax({
-                    url: "{{ url('/penggajian/getGaji') }}/" + userId,
+                    url: "{{ url('/admin/penggajian/getGaji') }}/" + userId,
                     type: "GET",
                     dataType: "json",
                     success: function (data) {
