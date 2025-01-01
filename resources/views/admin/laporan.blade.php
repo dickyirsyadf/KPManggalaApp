@@ -39,7 +39,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Penjualan</th>
+                        <th>Jenis Transaksi</th>
                         <th>Tanggal</th>
                         <th>Nominal</th>
                         {{-- <th>Action</th> --}}

@@ -7,17 +7,18 @@
 
 <div class="page-content">
     <section>
+        <!-- Daftar Penerima Gaji -->
         <div class="card">
             <div class="card-header">
-                <h4>Daftar Gaji</h4>
+                <h4>Daftar Penerima Gaji</h4>
                 <form action="{{ route('penggajian.store') }}" method="POST" class="row g-3">
                     @csrf
                     <div class="col-md-6">
                         <label for="id_karyawan" class="form-label">Nama</label>
-                        <select class="form-select" name="user_id" id="id_karyawan" required>
+                        <select class="form-select" name="id_karyawan" id="id_karyawan" required>
                             <option value="" disabled selected>Pilih Nama</option>
                             @foreach($daftarGaji as $gaji)
-                                <option value="{{ $gaji->id }}">{{ $gaji->nama }}</option> <!-- Menampilkan nama dari user -->
+                                <option value="{{ $gaji->id_karyawan }}">{{ $gaji->nama }}</option> <!-- Menampilkan nama dari user -->
                             @endforeach
                         </select>
                     </div>
@@ -49,6 +50,35 @@
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Slip Gaji Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>Slip Gaji</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Jumlah Hadir (Last Month)</th>
+                            <th>Tanggal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($slipGajis as $slipGaji)
+                            <tr>
+                                <td>{{ $slipGaji->nama }}</td>
+                                <td>{{ $slipGaji->jumlah_hadir }}</td>
+                                <td>{{ $slipGaji->tanggal }}</td>
+                                <td><button class="btn btn-primary">Print SlipGaji</button></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>

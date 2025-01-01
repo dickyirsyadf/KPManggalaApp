@@ -16,9 +16,10 @@ return new class extends Migration
             $table->string("nama");
             $table->string("bagian");
             $table->integer('jumlah_hadir');
-            $table->integer("lembur");
+            $table->dateTime("tanggal");
             $table->integer("penerimaan");
             $table->integer("potongan");
+            $table->integer("total");
             $table->timestamps();
         });
     }

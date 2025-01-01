@@ -14,13 +14,7 @@ class Transaksi extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id_muzakki',
-        'no_transaksi',
-        'id_jenis_transaksi',
-        'nominal_transaksi',
-        'tanggal_transaksi',
-        'status',
-        'keterangan',
+        'id_karyawan', 'no_transaksi', 'id_jenis_transaksi', 'nominal_transaksi', 'tanggal_transaksi',
     ];
 
     function jenis_transaksi()
@@ -30,11 +24,6 @@ class Transaksi extends Model
 
     function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
-    }
-
-    function muzakki()
-    {
-        return $this->belongsTo(Muzakki::class, 'id_muzakki');
+        return $this->belongsTo(User::class, 'id_karyawan');
     }
 }

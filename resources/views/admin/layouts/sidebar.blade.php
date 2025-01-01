@@ -76,6 +76,12 @@
                 </li>
 
                 <li class="sidebar-item">
+                    <a href="{{asset('admin/daftargaji')}}" class="sidebar-link">
+                        <i class="bi bi-file-earmark-image"></i>
+                        <span>Daftar Gaji</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="{{asset('admin/penggajian')}}" class="sidebar-link">
                         <i class="bi bi-file-earmark-image"></i>
                         <span>Penggajian</span>

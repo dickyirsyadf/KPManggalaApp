@@ -39,7 +39,6 @@ class BarangController extends Controller
                 'stock' => $request['stock'],
                 'harga' => $request['harga'],
             ]);
-
         } catch (Exception $e) {
             // dd($e->getMessage());
             return back()->with('error' . $e->getMessage() , 'Tambah barang Gagal! Isi Form Dengan Benar');
@@ -81,12 +80,12 @@ class BarangController extends Controller
             $barang = Barang::findOrFail($id);
             // Delete the item
             $barang->delete();
-    
+
             // Return a success response
             return back()->with('success', 'Hapus Barang Berhasil !');
         }catch(Exception $e){
             return back()->with('error', 'Hapus barang Gagal! Data Tidak Ditemukan');
         }
-        
+
     }
 }
