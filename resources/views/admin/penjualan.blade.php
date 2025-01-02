@@ -60,14 +60,56 @@
                             </tbody>
                         </table>
                         <h3 class="text-xl font-semibold mt-4">Total: <span id="total-price">0.00</span></h3>
-                        <button class="bg-green-500 text-white px-4 py-2 rounded mt-4" id="checkout">Checkout</button>
+                        <button class="btn btn-sm btn-success checkout-btn" data-bs-toggle="modal" data-bs-target="#modal-form-checkout" data-total="">
+                                Checkout
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 </div>
-
+<!-- Modal Checkout -->
+<div class="modal fade text-left modal-borderless modal-md" id="modal-form-checkout" tabindex="-1" role="dialog" aria-labelledby="modal-form-checkout" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3>Checkout Barang</h3>
+                    <p class="text-subtitle text-muted">
+                        Pastikan data sudah benar sebelum menyelesaikan transaksi.
+                    </p>
+                </div>
+            </div>
+            <form id="checkoutForm" method="POST" action="{{ route('penjualan.store') }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="total-price-modal">Total Harga</label>
+                        <input type="text" id="total-price-modal" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlah-bayar">Jumlah Bayar</label>
+                        <input type="number" id="jumlah-bayar" class="form-control" placeholder="Masukkan jumlah bayar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kembalian">Kembalian</label>
+                        <input type="text" id="kembalian" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Close</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary ms-1">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- DataTables JS -->
@@ -92,8 +134,8 @@
              { data: 'nama', name: 'nama', searchable: true },
              { data: 'stock', name: 'stock' },
              {
-                 data: 'harga',
-                 name: 'harga',
+                 data: 'harga_jual',
+                 name: 'harga_jual',
                  searchable: false,
                  render: function (data, type, row) {
                      return formatRupiah(data);
@@ -105,7 +147,7 @@
                      return `
                          <button class="btn btn-sm btn-primary edit-btn add-to-cart"
                                  data-nama="${row.nama}"
-                                 data-harga="${row.harga}">
+                                 data-harga="${row.harga_jual}">
                              Tambah
                          </button>
                      `;
@@ -123,7 +165,33 @@
 <script>
     const cartItems = $('#cart-items');
     const totalPriceElement = $('#total-price');
+    const modalTotalHarga = $('#modal-total-harga'); // Field for Total Harga in the modal
+    const modalJumlahBayar = $('#jumlah-bayar'); // Input for Jumlah Bayar in the modal
+    const modalKembalian = $('#kembalian'); // Field for Kembalian in the modal
     let totalPrice = 0;
+
+    // Update total price element and modal fields
+    function updateTotalPrice() {
+        totalPriceElement.data('raw-total', totalPrice).text(formatRupiah(totalPrice));
+        $('#total-price-modal').val(totalPrice); // Pass raw total to modal input
+    }
+
+    $('.checkout-btn').on('click', function () {
+        const rawTotal = totalPriceElement.data('raw-total'); // Get raw total
+        $('#total-price-modal').val(rawTotal); // Set raw total in modal
+    });
+
+
+    // Calculate and update Kembalian in the modal
+    modalJumlahBayar.on('input', function () {
+        const jumlahBayar = parseInt($(this).val()) || 0; // Get input value or default to 0
+        const rawTotal = parseInt($('#total-price-modal').val()) || 0; // Get the total from modal
+        const kembalian = jumlahBayar - rawTotal; // Calculate change
+        modalKembalian.val(formatRupiah(kembalian > 0 ? kembalian : 0)); // Update kembalian field
+    });
+</script>
+{{-- Cart manipulation --}}
+<script>
     // Add to cart button functionality
     $('#barangTable').on('click', '.add-to-cart', function () {
         const product = $(this).data('nama');
@@ -162,7 +230,7 @@
 
         // Update total price
         totalPrice += price;
-        totalPriceElement.data('raw-total', totalPrice).text(formatRupiah(totalPrice));
+        updateTotalPrice();
     });
 
     // Update quantity and total price on quantity change
@@ -184,7 +252,7 @@
         const totalItemPrice = quantity * price;
         totalCell.text(formatRupiah(totalItemPrice));
 
-        // Recalculate total price for all items
+        // Recalculate total price
         recalculateTotalPrice();
     });
 
@@ -193,16 +261,8 @@
         const row = $(this).closest('tr');
         row.remove();
 
-        // Recalculate total price for all items
+        // Recalculate total price
         recalculateTotalPrice();
-    });
-
-    // Checkout button functionality
-    $('#checkout').on('click', function () {
-        alert('Checkout - Total: ' + formatRupiah(totalPrice));
-        cartItems.empty();
-        totalPrice = 0;
-        totalPriceElement.data('raw-total', totalPrice).text(formatRupiah(totalPrice));
     });
 
     // Recalculate total price for all items in the cart
@@ -214,7 +274,78 @@
             const price = parseInt(row.data('price'));
             totalPrice += quantity * price;
         });
-        totalPriceElement.data('raw-total', totalPrice).text(formatRupiah(totalPrice));
+        updateTotalPrice();
+    }
+</script>
+{{-- submit modal penjualan --}}
+<script>
+    // Submit button functionality
+    $('#modal-form-checkout').on('submit', function (e) {
+        e.preventDefault();
+
+        const jumlahBayar = parseInt(modalJumlahBayar.val());
+        const kembalian = jumlahBayar - totalPrice;
+
+        if (jumlahBayar < totalPrice) {
+            alert('Jumlah bayar tidak cukup!');
+            return;
+        }
+
+        const formData = {
+            id: generateTransactionId(),
+            id_karyawan: '{{ auth()->user()->id }}', // Get logged-in user's ID
+            tgl_penjualan: new Date().toISOString().split('T')[0],
+            total_bayar: totalPrice,
+            bayar:jumlahBayar,
+            kembalian:kembalian,
+            detail_penjualans: []
+        };
+
+        // Gather cart items
+        cartItems.find('tr').each(function () {
+            const row = $(this);
+            const product = row.data('product');
+            const price = parseInt(row.data('price'));
+            const quantity = parseInt(row.find('.cart-quantity').val());
+            formData.detail_penjualans.push({
+                product,
+                harga_jual: price,
+                qty: quantity,
+                subtotal: price * quantity
+            });
+        });
+        // Get the CSRF token from the page
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        // Include CSRF token in the AJAX request
+        $.ajax({
+            url: '{{ route("penjualan.store") }}',
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': csrfToken, // Include CSRF token in the request headers
+            },
+            success: function (response) {
+                alert('Transaksi berhasil! Kembalian: ' + formatRupiah(kembalian));
+                $('#modal-form-checkout').modal('hide');
+                cartItems.empty();
+                totalPrice = 0;
+                updateTotalPrice();
+            },
+            error: function () {
+                alert('Terjadi kesalahan saat menyimpan data.');
+            }
+        });
+    });
+</script>
+{{-- Generate a unique transaction ID --}}
+<script>
+    function generateTransactionId() {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        const random = Math.floor(10000 + Math.random() * 90000);
+        return `TRS${day}${month}${year}${random}`;
     }
 </script>
 @endsection

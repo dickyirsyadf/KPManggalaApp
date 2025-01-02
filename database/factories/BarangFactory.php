@@ -20,7 +20,8 @@ class BarangFactory extends Factory
             'nama' => $this->faker->word(),
             'deskripsi' => $this->faker->word(),
             'stock' => $this->faker->numberBetween(1, 100),
-            'harga' => $this->faker->numberBetween(100000, 10000000),
+            'harga_jual' => $this->faker->numberBetween(100000, 300000),
+            'harga_modal' => $this->faker->numberBetween(50000, 150000),
         ];
     }
 }

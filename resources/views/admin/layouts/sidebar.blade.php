@@ -67,9 +67,8 @@
 
                 <hr style=" margin-bottom: -3px">
 
-
                 <li class="sidebar-item">
-                    <a href="{{asset('admin/laporan')}}" class="sidebar-link">
+                    <a href="{{asset('admin/laporan-keuangan')}}" class="sidebar-link">
                         <i class="bi bi-files"></i>
                         <span>Laporan</span>
                     </a>

@@ -74,7 +74,11 @@
                                 <td>{{ $slipGaji->nama }}</td>
                                 <td>{{ $slipGaji->jumlah_hadir }}</td>
                                 <td>{{ $slipGaji->tanggal }}</td>
-                                <td><button class="btn btn-primary">Print SlipGaji</button></td>
+                                <td>
+                                    <a href="{{ route('penggajian.print', $slipGaji->id) }}" target="_blank" class="btn btn-primary">
+                                        Print SlipGaji
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

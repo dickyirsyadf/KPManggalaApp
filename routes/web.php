@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DaftarGajiController;
 use App\http\Controllers\KaryawanController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PenggajianController;
 use App\Http\Controllers\PenjualanController;
 // use PDF;
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
         });
         Route::controller(PenjualanController::class)->group(function (){
             Route::get('penjualan','index')->name('penjualan');
+            Route::post('/penjualan', 'store')->name('penjualan.store');
         });
         Route::controller(DaftarGajiController::class)->group(function () {
             Route::get('/daftargaji', 'index')->name('daftargaji.index'); // Display the Daftar Gaji page
@@ -86,9 +88,15 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('/penggajian', 'index')->name('penggajian.index');
             Route::post('/penggajian', 'store')->name('penggajian.store');
             Route::get('/penggajian/slip/{id}','generateSlip')->name('penggajian.slip');
+            Route::get('/penggajian/print/{id}', 'printSlip')->name('penggajian.print');
             Route::get('/penggajian/getGaji/{id}','getGaji')->name('penggajian.getGaji');
 
         });
+        Route::controller(LaporanController::class)->group(function () {
+            Route::get('laporan-keuangan', 'laporan')->name('laporan.index');
+            Route::get('laporan-keuangan/export','exportLaporan')->name('laporan.export');
+        });
+
 
         Route::controller(AdminController::class)->group(function (){
             Route::get('/dashboard', 'dashboard');

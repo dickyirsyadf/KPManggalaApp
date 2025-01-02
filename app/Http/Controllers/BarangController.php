@@ -37,7 +37,8 @@ class BarangController extends Controller
                 'nama' => $request['nama'],
                 'deskripsi' => $request['deskripsi'],
                 'stock' => $request['stock'],
-                'harga' => $request['harga'],
+                'harga_jual' => $request['harga_jual'],
+                'harga_modal' => $request['harga_modal'],
             ]);
         } catch (Exception $e) {
             // dd($e->getMessage());
@@ -53,7 +54,8 @@ class BarangController extends Controller
                 'id_barang' => 'required|exists:barang,id',
                 'nama_barang' => 'required|string|max:255',
                 'fdeskripsi' => 'required|string|max:255',
-                'fharga' => 'required|numeric',
+                'fhargaj' => 'required|numeric',
+                'fhargam' => 'required|numeric',
                 'fstock' => 'required|integer',
             ]);
 
@@ -63,7 +65,8 @@ class BarangController extends Controller
             // Update the record
             $barang->nama = $request->nama_barang;
             $barang->deskripsi = $request->fdeskripsi;
-            $barang->harga = $request->fharga;
+            $barang->harga_jual = $request->fhargaj;
+            $barang->harga_modal = $request->fhargam;
             $barang->stock = $request->fstock;
             $barang->save();
 

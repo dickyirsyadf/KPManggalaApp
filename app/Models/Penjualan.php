@@ -2,10 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Penjualan extends Model
 {
-    use HasFactory;
+    protected $fillable = ['id', 'id_karyawan', 'tgl_penjualan', 'total_bayar'];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_karyawan', 'id');
+    }
+
+    public function detailPenjualans(): HasMany
+    {
+        return $this->hasMany(DetailPenjualan::class, 'id_penjualan', 'id');
+    }
 }

@@ -39,7 +39,8 @@
                             <th>Nama Barang</th>
                             <th>Deskripsi</th>
                             <th>Stock</th>
-                            <th>Harga</th>
+                            <th>Harga Jual</th>
+                            <th>Harga Modal</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -171,7 +172,16 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Harga" id="fharga" name="fharga" required
+                            <input type="text" class="form-control" placeholder="Harga Jual" id="fhargaj" name="fhargaj" required
+                                autocomplete="off">
+                            <div class="form-control-icon">
+                                <i class="bi bi-cash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group has-icon-left">
+                        <div class="position-relative">
+                            <input type="text" class="form-control" placeholder="Harga Modal" id="fhargam" name="fhargam" required
                                 autocomplete="off">
                             <div class="form-control-icon">
                                 <i class="bi bi-cash"></i>
@@ -242,8 +252,16 @@
                 { data: 'deskripsi', name: 'deskripsi',searchable: true },
                 { data: 'stock', name: 'stock' },
                 {
-                    data: 'harga',
-                    name: 'harga',
+                    data: 'harga_jual',
+                    name: 'harga_jual',
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return formatRupiah(data);
+                    }
+                },
+                {
+                    data: 'harga_modal',
+                    name: 'harga_modal',
                     searchable: false,
                     render: function (data, type, row) {
                         return formatRupiah(data);
@@ -259,7 +277,8 @@
                                     data-nama="${row.nama}"
                                     data-deskripsi="${row.deskripsi}"
                                     data-stock="${row.stock}"
-                                    data-harga="${row.harga}">
+                                    data-hargaj="${row.harga_jual}"
+                                    data-hargam="${row.harga_modal}">
                                 Edit
                             </button>
                             <button class="btn btn-sm btn-danger delete-btn"
@@ -285,13 +304,15 @@
         const id = $(this).data('id');
         const nama = $(this).data('nama');
         const deskripsi = $(this).data('deskripsi');
-        const harga = $(this).data('harga');
+        const hargaj = $(this).data('hargaj');
+        const hargam = $(this).data('hargam');
         const stock = $(this).data('stock');
         // Populate the modal form fields
         $('#id_barang').val(id);
         $('#nama_barang').val(nama);
         $('#fdeskripsi').val(deskripsi);
-        $('#fharga').val(harga);
+        $('#fhargaj').val(hargaj);
+        $('#fhargam').val(hargam);
         $('#fstock').val(stock);
 
         // Show the modal

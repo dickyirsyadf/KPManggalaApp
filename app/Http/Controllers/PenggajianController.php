@@ -156,9 +156,9 @@ class PenggajianController extends Controller
 
     public function printSlip($id)
     {
-        $slipGaji = SlipGaji::findOrFail($id);
+        $slipGaji = SlipGaji::findOrFail($id); // Ensure the SlipGaji record exists
 
-        $pdf = PDF::loadView('admin.penggajian.slip-gaji', compact('slipGaji'));
-        return $pdf->stream('slip-gaji.pdf');
+        $pdf = Pdf::loadView('admin.slip-gaji', compact('slipGaji'));
+        return $pdf->stream('slip-gaji-' . $slipGaji->id . '.pdf');
     }
 }
