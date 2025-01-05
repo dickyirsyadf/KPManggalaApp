@@ -7,6 +7,7 @@ use App\Models\HakAkses;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 
@@ -96,35 +97,52 @@ class DaftarGajiController extends Controller
     /**
      * Update an existing gaji record.
      */
-    public function update(Request $request, $id)
-{
-    $request->validate([
-        'id_karyawan' => 'required|exists:users,id',
-        'jumlah_hadir' => 'required|integer|min:0',
-        'gaji_perhari' => 'required|integer|min:0',
-        'absen' => 'required|integer|min:0',
-        'bonus' => 'required|integer|min:0',
-        'gaji_bersih' => 'required|integer|min:0',
-    ]);
+    public function update(Request $request)
+    {
+        try {
+            // Log the request payload for debugging
+            Log::info('Update request received', ['payload' => $request->all()]);
 
-    $gaji = DaftarGaji::findOrFail($id);
+            // Validate the request
+            $request->validate([
+                'id_karyawan' => 'required|exists:users,id',
+                'gaji_perhari' => 'required|integer|min:0',
+            ]);
 
-    // Retrieve the user's HakAkses and get the bagian
-    $user = User::with('hakAkses')->findOrFail($request->id_karyawan);
-    $bagian = $user->hakAkses->hakakses;
+            // Fetch the DaftarGaji record
+            $gaji = DaftarGaji::where('id_karyawan', $request->id_karyawan)->first();
 
-    $gaji->update([
-        'id_karyawan' => $request->id_karyawan,
-        'bagian' => $bagian,
-        'jumlah_hadir' => $request->jumlah_hadir,
-        'gaji_perhari' => $request->gaji_perhari,
-        'absen' => $request->absen,
-        'bonus' => $request->bonus,
-        'gaji_bersih' => $request->gaji_bersih,
-    ]);
+            // Log if the record is not found
+            if (!$gaji) {
+                Log::warning('DaftarGaji record not found', ['id_karyawan' => $request->id_karyawan]);
+                return response()->json(['message' => 'Record not found'], 404);
+            }
 
-    return response()->json(['message' => 'Gaji record updated successfully!']);
-}
+            // Log the record before updating
+            Log::info('DaftarGaji record before update', ['record' => $gaji]);
+
+            // Perform the update
+            $gaji->update([
+                'gaji_perhari' => $request->gaji_perhari,
+                'gaji_bersih' => 0,
+            ]);
+
+            // Log the updated record
+            Log::info('DaftarGaji record updated successfully', ['updated_record' => $gaji->fresh()]);
+
+            return back()->with('success', 'Edit Gaji Berhasil');
+        } catch (\Exception $e) {
+            // Log the exception
+            Log::error('Error updating DaftarGaji record', [
+                'error_message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->with('Gagal', 'Edit Gaji Gagal');
+        }
+    }
+
+
 
 
     /**

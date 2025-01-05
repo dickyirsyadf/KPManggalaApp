@@ -23,7 +23,7 @@
                         <input type="date" class="form-control" name="end_date" id="end_date" value="{{ request('end_date') }}">
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        <button type="submit" class="btn btn-success w-100">Filter</button>
                     </div>
                 </form>
             </div>
@@ -51,20 +51,31 @@
                             $no = 1; // Initialize row number
                             $saldo = 0; // Initialize saldo
                         @endphp
-                        @foreach($laporan as $item)
+                        @foreach($laporan as $index => $item)
                             @php
-                                // Properly calculate saldo by deducting kredit correctly when it's negative
-                                $saldo += $item['debet'] + $item['kredit']; // If kredit is negative, it will decrease saldo
+                                if ($index === 0) {
+                                    // First row logic
+                                    if ($item['debet'] == 0) {
+                                        $saldo = 0 - abs($item['kredit']); // Subtract kredit from 0
+                                    } else {
+                                        $saldo = $item['debet'] - abs($item['kredit']); // Add debet, subtract kredit
+                                    }
+                                } else {
+                                    // Standard logic for subsequent rows
+                                    $saldo += $item['debet'] - abs($item['kredit']); // Add debet, subtract kredit
+                                }
                             @endphp
                             <tr>
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $item['keterangan'] }}</td>
                                 <td>{{ $item['tanggal'] }}</td>
+                                {{-- <td>{{ number_format($item['debet'], 0, ',', '.') }} <button class="btn btn-sm btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#modaldetail">Detail</button></td> --}}
                                 <td>{{ number_format($item['debet'], 0, ',', '.') }}</td>
                                 <td>{{ number_format($item['kredit'], 0, ',', '.') }}</td>
                                 <td>{{ number_format($saldo, 0, ',', '.') }}</td>
                             </tr>
                         @endforeach
+
 
 
                     </tbody>
@@ -86,4 +97,42 @@
         </div>
     </section>
 </div>
+
+{{-- Modal Detail --}}
+<div class="modal fade text-left modal-borderless" id="modaldetail" tabindex="-1" role="dialog"
+    aria-labelledby="modaldetail" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Laporan</h5>
+                <button type="button" class="close rounded-pill" data-bs-dismiss="modal" aria-label="Close">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST">
+                    @csrf
+                    <!-- User Input Fields -->
+                    <div class="form-group has-icon-left">
+                        <div class="position-relative">
+                            <input id="gaji_perhari" name="gaji_perhari" type="number" placeholder="Gaji Perhari"
+                                class="form-control" autocomplete="off" />
+                            <div class="form-control-icon">
+                                <i class="bi bi-plus-slash-minus"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                            <i class="bx bx-x d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">Close</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

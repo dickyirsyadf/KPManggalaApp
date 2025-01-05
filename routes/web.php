@@ -74,7 +74,7 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('/daftargaji', 'index')->name('daftargaji.index'); // Display the Daftar Gaji page
             Route::get('/daftargaji/data','data')->name('daftargaji.data');
             Route::post('/tambahgaji', 'store')->name('daftargaji.store'); // Store a new entry
-            Route::put('/daftargaji/update', 'update')->name('daftargaji.update'); // Update an existing entry
+            Route::post('/daftargaji/update', 'update')->name('daftargaji.update'); // Update an existing entry
             Route::delete('/daftargaji/{id}', 'destroy')->name('daftargaji.destroy'); // Delete an entry
             Route::get('/daftargaji/{id}', 'show')->name('daftargaji.show'); // Fetch data for a specific entry
         });

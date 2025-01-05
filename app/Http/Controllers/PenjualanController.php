@@ -76,6 +76,7 @@ class PenjualanController extends Controller
             Log::info('Transaction ID: ' . $penjualan->id);  // Log the transaction ID to ensure it's being created
 
             // Insert into detail_penjualans and update stock
+            $totalNominalTransaksi = 0;
             foreach ($validated['detail_penjualans'] as $item) {
                 // Look up the product in the database using its name
                 $barang = Barang::where('nama', $item['product'])->first();
@@ -84,8 +85,9 @@ class PenjualanController extends Controller
                     // If stock is not sufficient, return error response
                     return response()->json(['error' => 'Stock not sufficient for ' . $item['product']], 400);
                 }
-                // Calculate the margin (harga_jual - harga_modal)
-                $margin = $barang->harga_jual - $barang->harga_modal;
+                // Calculate the margin per unit and total margin
+                $marginPerUnit = $barang->harga_jual - $barang->harga_modal;
+                $totalMargin = $marginPerUnit * $item['qty'];
                 // Insert each item into the detail_penjualan table
                 DetailPenjualan::create([
                     'id_penjualan' => $transactionId, // Associate with the correct transaction ID
@@ -93,9 +95,10 @@ class PenjualanController extends Controller
                     'qty' => $item['qty'],
                     'harga' => $barang->harga_jual,
                     'subtotal' => $item['subtotal'],
-                    'margin' =>$margin,
+                    'margin' =>$totalMargin,
                 ]);
-
+                // Add the item's subtotal to the total nominal transaksi
+                $totalNominalTransaksi += $item['subtotal'];
                 // Update product stock after the sale
                 $barang->update(['stock' => $barang->stock - $item['qty']]);
             }
@@ -105,7 +108,7 @@ class PenjualanController extends Controller
                     'id_karyawan' => auth()->id(),
                     'no_transaksi'=> $transactionId,
                     'id_jenis_transaksi' => 1,
-                    'nominal_transaksi' => $item['subtotal'],
+                    'nominal_transaksi' => $totalNominalTransaksi,
                     'tanggal_transaksi' => now(),
                 ]);
 

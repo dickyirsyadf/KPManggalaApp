@@ -22,6 +22,11 @@
 </head>
 <body>
     <h2 style="text-align: center;">Laporan Keuangan</h2>
+    <p style="text-align: center;">Periode:
+        {{ \Carbon\Carbon::parse($startDate)->format('d-m-Y') }}
+        sampai
+        {{ \Carbon\Carbon::parse($endDate)->format('d-m-Y') }}
+    </p>
     <table class="table">
         <thead>
             <tr>
@@ -38,19 +43,19 @@
                 $no = 1;
                 $saldo = 0;
             @endphp
-            @foreach($transactions as $transaction)
+            @foreach($laporan as $item)
                 @php
-                    $debit = $transaction->type === 'debit' ? $transaction->amount : 0;
-                    $credit = $transaction->type === 'credit' ? $transaction->amount : 0;
-                    $saldo += $debit - $credit;
+                    $debet = $item['debet'] ?? 0;
+                    $kredit = $item['kredit'] ?? 0;
+                    $saldo += $debet - abs($kredit);
                 @endphp
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $transaction->description }}</td>
-                    <td>{{ \Carbon\Carbon::parse($transaction->date)->format('d-m-Y') }}</td>
-                    <td>Rp {{ number_format($debit, 2, ',', '.') }}</td>
-                    <td>Rp {{ number_format($credit, 2, ',', '.') }}</td>
-                    <td>Rp {{ number_format($saldo, 2, ',', '.') }}</td>
+                    <td>{{ $item['keterangan'] }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') }}</td>
+                    <td>Rp {{ number_format($debet, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format(abs($kredit), 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($saldo, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
