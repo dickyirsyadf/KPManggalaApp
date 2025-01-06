@@ -18,6 +18,10 @@
         .table th {
             background-color: #f2f2f2;
         }
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -27,15 +31,18 @@
         sampai
         {{ \Carbon\Carbon::parse($endDate)->format('d-m-Y') }}
     </p>
+    <!-- Table Content -->
+    <!-- Table Content -->
     <table class="table">
         <thead>
             <tr>
                 <th>No</th>
-                <th>Keterangan</th>
                 <th>Tanggal</th>
+                <th>Keterangan</th>
                 <th>Debet (Masuk)</th>
                 <th>Kredit (Keluar)</th>
                 <th>Saldo</th>
+                <th>Margin</th>
             </tr>
         </thead>
         <tbody>
@@ -45,20 +52,34 @@
             @endphp
             @foreach($laporan as $item)
                 @php
-                    $debet = $item['debet'] ?? 0;
-                    $kredit = $item['kredit'] ?? 0;
-                    $saldo += $debet - abs($kredit);
+                    $saldo += $item['debet'] - $item['kredit'];
                 @endphp
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $item['keterangan'] }}</td>
                     <td>{{ \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') }}</td>
-                    <td>Rp {{ number_format($debet, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format(abs($kredit), 0, ',', '.') }}</td>
+                    <td>{{ $item['keterangan'] }}</td>
+                    <td>Rp {{ number_format($item['debet'], 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($item['kredit'], 0, ',', '.') }}</td>
                     <td>Rp {{ number_format($saldo, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($item['margin'], 0, ',', '.') }}</td>
                 </tr>
             @endforeach
+
+            <!-- Merge rows for Total Penjualan and Total Keuntungan -->
+            <tr>
+                <td colspan="3" style="text-align: right;"><strong>Total Penjualan</strong></td>
+                <td colspan="2" style="text-align: center;">Rp {{ number_format($totalDebet, 0, ',', '.') }}</td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: right;"><strong>Total Keuntungan</strong></td>
+                <td colspan="2" style="text-align: center;"></td> <!-- Empty cells for the Debet and Kredit columns -->
+                <td colspan="2" style="text-align: center;">Rp {{ number_format($totalMargin, 0, ',', '.') }}</td>
+            </tr>
         </tbody>
     </table>
+
+    <!-- Other content for the report -->
+
 </body>
 </html>

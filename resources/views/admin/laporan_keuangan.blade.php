@@ -51,36 +51,26 @@
                             $no = 1; // Initialize row number
                             $saldo = 0; // Initialize saldo
                         @endphp
-                        @foreach($laporan as $index => $item)
+                        @foreach($laporan as $item)
                             @php
-                                if ($index === 0) {
-                                    // First row logic
-                                    if ($item['debet'] == 0) {
-                                        $saldo = 0 - abs($item['kredit']); // Subtract kredit from 0
-                                    } else {
-                                        $saldo = $item['debet'] - abs($item['kredit']); // Add debet, subtract kredit
-                                    }
-                                } else {
-                                    // Standard logic for subsequent rows
-                                    $saldo += $item['debet'] - abs($item['kredit']); // Add debet, subtract kredit
-                                }
+                                $saldo += $item['debet'] - abs($item['kredit']); // Calculate saldo
                             @endphp
                             <tr>
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $item['keterangan'] }}</td>
                                 <td>{{ $item['tanggal'] }}</td>
-                                {{-- <td>{{ number_format($item['debet'], 0, ',', '.') }} <button class="btn btn-sm btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#modaldetail">Detail</button></td> --}}
-                                <td>{{ number_format($item['debet'], 0, ',', '.') }}</td>
+                                <td class="d-flex justify-content-between">
+                                    <span class="debet-text">{{ number_format($item['debet'], 0, ',', '.') }}</span>
+                                    <button class="btn btn-sm btn-primary ms-2 detail-btn" data-bs-toggle="modal" data-bs-target="#modaldetail" data-margin="{{ $item['margin'] ?? 0 }}" data-total-bayar="{{ $item['total_bayar'] ?? 0 }}">
+                                        Detail
+                                    </button>
+                                </td>
                                 <td>{{ number_format($item['kredit'], 0, ',', '.') }}</td>
                                 <td>{{ number_format($saldo, 0, ',', '.') }}</td>
                             </tr>
                         @endforeach
-
-
-
                     </tbody>
                 </table>
-
             </div>
         </div>
 
@@ -99,40 +89,75 @@
 </div>
 
 {{-- Modal Detail --}}
-<div class="modal fade text-left modal-borderless" id="modaldetail" tabindex="-1" role="dialog"
-    aria-labelledby="modaldetail" aria-hidden="true">
+<div class="modal fade text-left modal-borderless" id="modaldetail" tabindex="-1" role="dialog" aria-labelledby="modaldetail" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Detail Laporan</h5>
-                <button type="button" class="close rounded-pill" data-bs-dismiss="modal" aria-label="Close">
-                    <i data-feather="x"></i>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="" method="POST">
-                    @csrf
-                    <!-- User Input Fields -->
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input id="gaji_perhari" name="gaji_perhari" type="number" placeholder="Gaji Perhari"
-                                class="form-control" autocomplete="off" />
-                            <div class="form-control-icon">
-                                <i class="bi bi-plus-slash-minus"></i>
-                            </div>
-                        </div>
+                <form>
+                    <div class="form-group">
+                        <label for="margin">Margin</label>
+                        <input id="margin" name="margin" type="text" class="form-control" readonly>
                     </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                            <i class="bx bx-x d-block d-sm-none"></i>
-                            <span class="d-none d-sm-block">Close</span>
-                        </button>
+                    <div class="form-group">
+                        <label for="total_bayar">Total Bayar</label>
+                        <input id="total_bayar" name="total_bayar" type="text" class="form-control" readonly>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- Bootstrap JS (Optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Mengubah format mata uang rupiah  -->
+<script>
+   // Format Rupiah function
+   function formatRupiah(amount) {
+        if (!amount) return 'Rp. 0'; // Handle empty or null values
+        return 'Rp. ' + parseInt(amount, 10).toLocaleString('id-ID', { minimumFractionDigits: 0 });
+    }
+
+    $(document).ready(function () {
+        // Format "Debet (Masuk)", "Kredit (Keluar)", "Saldo" columns on page load
+        $('table tbody tr').each(function () {
+            const debetCell = $(this).find('td:nth-child(4)');
+            const kreditCell = $(this).find('td:nth-child(5)');
+            const saldoCell = $(this).find('td:nth-child(6)');
+
+            // For Debet (Masuk), only format the numeric value and leave the button intact
+            const debetText = debetCell.find('.debet-text');
+            debetText.text(formatRupiah(debetText.text().replace(/[^\d,-]/g, '')));
+
+            // Format Kredit (Keluar) and Saldo columns
+            const kreditText = kreditCell.text().replace(/[^\d,-]/g, '');
+            kreditCell.text(formatRupiah(kreditText));
+
+            const saldoText = saldoCell.text().replace(/[^\d,-]/g, '');
+            saldoCell.text(formatRupiah(saldoText));
+        });
+    });
+</script>
+<script>
+    $(document).on('click', '.detail-btn', function () {
+        const margin = $(this).data('margin');
+        const totalBayar = $(this).data('total-bayar');
+
+        $('#margin').val(formatRupiah(margin));
+        $('#total_bayar').val(formatRupiah(totalBayar));
+
+        $('#modaldetail').modal('show');
+    });
+</script>
 
 @endsection
