@@ -9,8 +9,10 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DaftarGajiController;
 use App\http\Controllers\KaryawanController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\ObatController;
 use App\Http\Controllers\PenggajianController;
 use App\Http\Controllers\PenjualanController;
+use App\Models\Barang;
 // use PDF;
 use Illuminate\Support\Facades\PDF;
 
@@ -49,12 +51,12 @@ Route::get('logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
     Route::prefix('admin')->group(function ()  {
-        Route::controller(BarangController::class)->group(function () {
-            Route::get('barang','index');
-            Route::get('barang/data','barang')->name('barang.data');
-            Route::post('/tambahbarang', 'create');
-            Route::post('/barang/edit', 'update')->name('barang.update');
-            Route::delete('/barang/{id}','delete')->name('barang.delete');
+        Route::controller(ObatController::class)->group(function () {
+            Route::get('obat','index');
+            Route::get('obat/data','obat')->name('obat.data');
+            Route::post('/tambahobat', 'create');
+            Route::post('/obat/edit', 'update')->name('obat.update');
+            Route::delete('/obat/{id}','delete')->name('obat.delete');
 
         });
         Route::controller(KaryawanController::class)->group(function () {

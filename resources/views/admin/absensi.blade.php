@@ -1,7 +1,7 @@
 @extends('admin.layouts.admin-master')
 
 @section('admin-master')
-<div class="page-heading ">
+<div class="page-heading">
     <div class="page-title">
         <div class="row">
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
@@ -40,14 +40,14 @@
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="kehadiran" id="kehadiran" checked>
-                        <label class="form-check-label" for="kehadiran">Present</label>
+                        <label class="form-check-label" for="kehadiran">Hadir</label>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Save</button>
+                    <button type="submit" class="btn btn-primary mt-3">Simpan</button>
                 </form>
 
                 <h2 class="mt-5">Absensi Records</h2>
-                <table class="table table-bordered">
-                    <thead>
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-primary">
                         <tr>
                             <th>Karyawan</th>
                             <th>Tanggal</th>
@@ -60,7 +60,11 @@
                             <tr>
                                 <td>{{ $absensis->user->nama }}</td>
                                 <td>{{ $absensis->tanggal }}</td>
-                                <td>{{ $absensis->kehadiran == 1 ? 'Present' : 'Absent' }}</td>
+                                <td>
+                                    <span class="badge {{ $absensis->kehadiran == 1 ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $absensis->kehadiran == 1 ? 'Hadir' : 'Tidak Hadir' }}
+                                    </span>
+                                </td>
                                 <td>
                                     <!-- Edit button -->
                                     <button class="btn btn-sm btn-primary edit-btn"
@@ -76,6 +80,10 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $absensi->links('pagination::bootstrap-4') }}
+                </div>
+
             </div>
 
             @if ($errors->any())
@@ -118,8 +126,8 @@
                     <div class="form-group">
                         <label for="editKehadiran" class="form-label">Kehadiran</label>
                         <select name="kehadiran" class="form-select" id="editKehadiran" required>
-                            <option value="1">Present</option>
-                            <option value="0">Absent</option>
+                            <option value="1">Hadir</option>
+                            <option value="0">Tidak Hadir</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -135,8 +143,6 @@
         </div>
     </div>
 </div>
-<!-- Bootstrap JS (Optional) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const editButtons = document.querySelectorAll('.edit-btn');
@@ -154,5 +160,4 @@
         });
     });
 </script>
-
 @endsection

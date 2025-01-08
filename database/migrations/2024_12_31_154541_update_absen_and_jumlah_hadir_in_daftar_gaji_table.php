@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateAbsenAndJumlahHadirInDaftarGajisTable extends Migration
+class UpdateAbsenAndJumlahHadirInDaftarGajiTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class UpdateAbsenAndJumlahHadirInDaftarGajisTable extends Migration
      */
     public function up()
     {
-        Schema::table('daftar_gajis', function (Blueprint $table) {
+        Schema::table('daftar_gaji', function (Blueprint $table) {
             $table->integer('absen')->nullable()->change();
             $table->integer('jumlah_hadir')->nullable()->change();
         });
@@ -26,7 +26,7 @@ class UpdateAbsenAndJumlahHadirInDaftarGajisTable extends Migration
      */
     public function down()
     {
-        Schema::table('daftar_gajis', function (Blueprint $table) {
+        Schema::table('daftar_gaji', function (Blueprint $table) {
             $table->integer('absen')->nullable(false)->change();
             $table->integer('jumlah_hadir')->nullable(false)->change();
         });

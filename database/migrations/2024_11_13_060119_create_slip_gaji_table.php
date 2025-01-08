@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('slip_gajis', function (Blueprint $table) {
-            $table->unsignedBigInteger("id");
+        Schema::create('slip_gaji', function (Blueprint $table) {
+            $table->id();
+            $table->string("id_karyawan");
             $table->string("nama");
             $table->string("bagian");
             $table->integer('jumlah_hadir');
@@ -21,6 +22,8 @@ return new class extends Migration
             $table->integer("potongan");
             $table->integer("total");
             $table->timestamps();
+
+            $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('slip_gajis');
+        Schema::dropIfExists('slip_gaji');
     }
 };

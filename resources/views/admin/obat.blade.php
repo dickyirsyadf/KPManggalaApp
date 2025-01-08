@@ -36,7 +36,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nama Barang</th>
+                            <th>Nama Obat</th>
                             <th>Deskripsi</th>
                             <th>Stock</th>
                             <th>Harga Jual</th>
@@ -65,11 +65,11 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/admin/tambahbarang" method="POST">
+                <form action="/admin/tambahobat" method="POST">
                     @csrf
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input id="nama" name="nama" type="text" placeholder="Nama Barang" class="form-control"
+                            <input id="nama" name="nama" type="text" placeholder="Nama Obat" class="form-control"
                                 autocomplete="off" />
                             <div class="form-control-icon">
                                 <i class="bi bi-basket-fill"></i>
@@ -78,7 +78,7 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input id="deskripsi" name="deskripsi" type="text" placeholder="Deskripsi Barang" class="form-control"
+                            <input id="deskripsi" name="deskripsi" type="text" placeholder="Deskripsi Obat" class="form-control"
                                 autocomplete="off" />
                             <div class="form-control-icon">
                                 <i class="bi bi-card-list"></i>
@@ -87,7 +87,7 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input id="stock" name="stock" type="number" placeholder="Stock Barang" class="form-control"
+                            <input id="stock" name="stock" type="number" placeholder="Stock Obat" class="form-control"
                                 autocomplete="off" />
                             <div class="form-control-icon">
                                 <i class="bi bi-plus-slash-minus"></i>
@@ -96,7 +96,16 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                        <input id="harga" name="harga" type="number" placeholder="Harga Barang" class="form-control"
+                        <input id="harga_jual" name="harga_jual" type="number" placeholder="Harga Jual" class="form-control"
+                                autocomplete="off" />
+                            <div class="form-control-icon">
+                                <i class="bi bi-cash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group has-icon-left">
+                        <div class="position-relative">
+                        <input id="harga_modal" name="harga_modal" type="number" placeholder="Harga Modal" class="form-control"
                                 autocomplete="off" />
                             <div class="form-control-icon">
                                 <i class="bi bi-cash"></i>
@@ -125,18 +134,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h3>Edit Barang</h3>
+                    <h3>Edit Obat</h3>
                     <p class="text-subtitle text-muted">
                         Tambahkan keterangan setiap mengubah data, agar memudahkan pembukuan
                     </p>
                 </div>
             </div>
-            <form method="POST" action="{{ route('barang.update') }}">
+            <form method="POST" action="{{ route('obat.update') }}">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="ID Barang" id="id_barang"
+                            <input type="text" class="form-control" placeholder="ID Obat" id="id_barang"
                                 name="id_barang" required autocomplete="off" readonly>
                             <div class="form-control-icon">
                                 <i class="bi bi-file-earmark-binary"></i>
@@ -145,7 +154,7 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Nama Barang" name="nama_barang" id="nama_barang" required
+                            <input type="text" class="form-control" placeholder="Nama Obat" name="nama_barang" id="nama_barang" required
                                 autocomplete="default">
                             <div class="form-control-icon">
                                 <i class="bi bi-basket-fill"></i>
@@ -245,7 +254,7 @@
         $('#barangTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('barang.data') }}",
+            ajax: "{{ route('obat.data') }}",
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'nama', name: 'nama', searchable: true },
@@ -329,7 +338,7 @@
         $('#itemName').text(name);
 
         // Set the form action to the correct delete URL
-        $('#deleteForm').attr('action', '/admin/barang/' + id);
+        $('#deleteForm').attr('action', '/admin/obat/' + id);
 
         // Show the delete confirmation modal
         $('#deleteModal').modal('show');

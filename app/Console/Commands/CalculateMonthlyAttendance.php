@@ -25,7 +25,7 @@ class CalculateMonthlyAttendance extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Command to calculate monthly attendance and update salaries';
 
     /**
      * Execute the console command.
@@ -37,6 +37,12 @@ class CalculateMonthlyAttendance extends Command
         try {
             $previousMonth = now()->subMonth();
             $daysInMonth = $previousMonth->daysInMonth;
+
+            // Define holidays (dates in 'Y-m-d' format)
+            $holidays = [
+                "{$previousMonth->year}-{$previousMonth->month}-01", // Example holiday
+                "{$previousMonth->year}-{$previousMonth->month}-25", // Example holiday
+            ];
 
             Log::info('Previous month calculated.', [
                 'year' => $previousMonth->year,
@@ -56,25 +62,55 @@ class CalculateMonthlyAttendance extends Command
                 'attendanceCounts' => $attendanceCounts->toArray(),
             ]);
 
+            // Calculate Sundays and holidays
+            $sundays = [];
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $date = Carbon::create($previousMonth->year, $previousMonth->month, $day);
+                if ($date->isSunday()) {
+                    $sundays[] = $date->toDateString();
+                }
+            }
+            $holidayCount = count(array_intersect($holidays, $sundays));
+
+            Log::info('Sundays and holidays calculated.', [
+                'sundays' => $sundays,
+                'holidays' => $holidays,
+                'holidayCount' => $holidayCount,
+            ]);
+
             // Update DaftarGaji records
             foreach ($attendanceCounts as $attendance) {
-                $bonus = $attendance->jumlah_hadir == $daysInMonth ? 100000 : 0;
+                // Calculate the total attended days (including Sundays and holidays)
+                $attendedDays = $attendance->jumlah_hadir + $holidayCount;
 
                 // Calculate the number of non-attended days
-                $jumlah_tidak_hadir = $daysInMonth - $attendance->jumlah_hadir;
+                $jumlah_tidak_hadir = max(0, $daysInMonth - $attendedDays);
 
+                // Fetch gaji_perhari for the employee
+                $daftarGaji = DaftarGaji::where('id_karyawan', $attendance->id_karyawan)->first();
+                $gajiPerHari = $daftarGaji->gaji_perhari ?? 0;
+
+                // Calculate bonus
+                $bonus = $attendedDays == $daysInMonth ? 100000 : 0;
+
+                // Calculate gaji_bersih
+                $gajiBersih = ($attendedDays * $gajiPerHari) + $bonus - ($jumlah_tidak_hadir * 100000);
+
+                // Update DaftarGaji record
                 DaftarGaji::where('id_karyawan', $attendance->id_karyawan)
                     ->update([
-                        'jumlah_hadir' => $attendance->jumlah_hadir,
+                        'jumlah_hadir' => $attendedDays,
                         'absen' => $jumlah_tidak_hadir,  // Store the non-attended days
                         'bonus' => $bonus,
+                        'gaji_bersih' => $gajiBersih,
                     ]);
 
                 Log::info('DaftarGaji updated for employee.', [
                     'id_karyawan' => $attendance->id_karyawan,
-                    'jumlah_hadir' => $attendance->jumlah_hadir,
+                    'jumlah_hadir' => $attendedDays,
                     'absen' => $jumlah_tidak_hadir,
                     'bonus' => $bonus,
+                    'gaji_bersih' => $gajiBersih,
                 ]);
             }
 
@@ -89,6 +125,4 @@ class CalculateMonthlyAttendance extends Command
             $this->error('An error occurred while updating attendance data. Check logs for details.');
         }
     }
-
-
 }

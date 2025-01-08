@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
-class Barang extends Model
+
+class Obat extends Model
 {
     use HasFactory;
-    protected $table = 'barang';
+    protected $table = 'obat';
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -24,6 +25,6 @@ class Barang extends Model
     ];
     public function detailPenjualans(): HasMany
     {
-        return $this->hasMany(DetailPenjualan::class, 'id_barang', 'id');
+        return $this->hasMany(DetailPenjualan::class, 'id_obat', 'id');
     }
 }

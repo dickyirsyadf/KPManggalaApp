@@ -13,7 +13,7 @@ class DaftarGaji extends Model
         'id_karyawan', 'nama', 'bagian', 'jumlah_hadir', 'gaji_perhari', 'absen', 'bonus', 'gaji_bersih'
     ];
 
-
+    protected $table = 'daftar_gaji';
     public function slipGaji()
     {
         return $this->hasMany(SlipGaji::class);

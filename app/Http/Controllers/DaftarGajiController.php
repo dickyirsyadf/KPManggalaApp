@@ -33,11 +33,11 @@ class DaftarGajiController extends Controller
      */
     public function data()
 {
-    $data = DB::table('daftar_gajis')
-        ->join('users as karyawan', 'daftar_gajis.id_karyawan', '=', 'karyawan.id')
+    $data = DB::table('daftar_gaji')
+        ->join('users as karyawan', 'daftar_gaji.id_karyawan', '=', 'karyawan.id')
         ->join('hakakses', 'karyawan.id_hakakses', '=', 'hakakses.id') // Join the hakakses table
         ->select(
-            'daftar_gajis.*',
+            'daftar_gaji.*',
             'karyawan.nama',
             'hakakses.hakakses' // Use bagian from hakakses
         )

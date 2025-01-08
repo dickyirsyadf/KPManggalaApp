@@ -10,7 +10,7 @@ class Absensi extends Model
     use HasFactory;
 
     protected $fillable = ['id_karyawan', 'tanggal', 'kehadiran'];
-
+    protected $table = 'absensi';
     public function user()
     {
         return $this->belongsTo(User::class, 'id_karyawan');

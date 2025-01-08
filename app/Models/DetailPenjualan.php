@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetailPenjualan extends Model
 {
-    protected $fillable = ['id_penjualan', 'id_barang', 'qty', 'harga', 'subtotal','margin'];
+    protected $fillable = ['id_penjualan', 'id_obat', 'qty', 'harga', 'subtotal','margin'];
+    protected $table = 'detail_penjualan';
 
     public function penjualan(): BelongsTo
     {
         return $this->belongsTo(Penjualan::class, 'id_penjualan', 'id');
     }
 
-    public function barang(): BelongsTo
+    public function obat(): BelongsTo
     {
-        return $this->belongsTo(Barang::class, 'id_barang', 'id');
+        return $this->belongsTo(Obat::class, 'id_obat', 'id');
     }
     public function transaksi()
     {

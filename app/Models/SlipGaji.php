@@ -10,7 +10,7 @@ class SlipGaji extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
+        'id_karyawan',
         'nama',
         'bagian',
         'jumlah_hadir',
@@ -21,6 +21,9 @@ class SlipGaji extends Model
         'created_at',
         'update_at'
     ];
+
+    protected $table = 'slip_gaji';
+
 
     public function daftarGaji()
 {

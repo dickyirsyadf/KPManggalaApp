@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('penggajians', function (Blueprint $table) {
-            $table->unsignedBigInteger("id");
+        Schema::create('obat', function (Blueprint $table) {
+            $table->id();
             $table->string("nama");
-            $table->string("bagian");
-            $table->date("tgl_terima_gaji");
+            $table->string("deskripsi");
+            $table->integer("stock");
+            $table->integer("harga_jual");
+            $table->integer("harga_modal");
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('penggajians');
+        Schema::dropIfExists('obat');
     }
 };

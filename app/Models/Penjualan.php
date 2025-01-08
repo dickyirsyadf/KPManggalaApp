@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Penjualan extends Model
 {
     protected $fillable = ['id', 'id_karyawan', 'tgl_penjualan', 'total_bayar'];
-
+    protected $table = 'penjualan';
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_karyawan', 'id');

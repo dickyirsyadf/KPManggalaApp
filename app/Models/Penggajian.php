@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Penggajian extends Model
 {
     use HasFactory;
-    protected $fillable = ['id', 'nama', 'bagian', 'tgl_terima_gaji'];
+    protected $fillable = ['id_karyawan', 'nama', 'bagian', 'tgl_terima_gaji'];
+    protected $table = 'penggajian';
 }

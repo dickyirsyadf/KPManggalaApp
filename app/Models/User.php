@@ -20,6 +20,8 @@ class User extends Authenticatable
      */
     protected $table = 'users';
     protected $primaryKey = 'id';
+    public $incrementing = false; // Disable auto-increment
+    protected $keyType = 'string'; // Use string for the primary key type
 
     protected $fillable = [
         'nama',

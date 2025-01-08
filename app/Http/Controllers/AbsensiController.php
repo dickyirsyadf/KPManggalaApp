@@ -13,7 +13,7 @@ class AbsensiController extends Controller
     public function index()
     {
         $users = User::all();
-        $absensi = Absensi::with('user')->get();
+        $absensi = Absensi::with('user')->paginate(10); // Adjust the number to your desired items per page
         $data = ['menu'=>'Absensi'];
 
         return view('admin.absensi', compact('users', 'absensi','data'));

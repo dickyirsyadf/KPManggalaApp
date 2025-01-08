@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('absensi', function (Blueprint $table) {
             $table->id();
-            $table->string("nama");
-            $table->string("alamat")->nullable();
+            $table->string('id_karyawan');
+            $table->date("tanggal");
+            $table->boolean('kehadiran')->default(true);
             $table->timestamps();
+
+            $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::dropIfExists('absensi');
     }
 };

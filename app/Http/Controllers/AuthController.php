@@ -46,6 +46,7 @@ class AuthController extends Controller
                         'no_transaksi' => 'Login',
                         'tanggal' => $dateNow
                     ]);
+                    // dd(auth()->user()->id);
                     return redirect()->intended('admin/dashboard');
                 } elseif ($user->id_hakakses === 2) {
                     $request->session()->regenerate();
@@ -77,6 +78,7 @@ class AuthController extends Controller
                 'password1' => 'required|same:password'
             ]);
 
+            $credentials['id'] = $this->generateUserId();
             $credentials['id_hakakses'] = 2;
             $credentials['password'] = bcrypt($credentials['password']);
 
@@ -86,6 +88,12 @@ class AuthController extends Controller
             // dd($e->getMessage());
             return back()->with('error', 'Daftar Akun Gagal. Isi Form Pendaftaran Dengan Benar!!');
         }
+    }
+    private function generateUserId()
+    {
+        $lastUser = User::orderBy('id', 'desc')->first();
+        $lastId = $lastUser ? intval(substr($lastUser->id, 1)) : 0; // Strip 'U' and get numeric part
+        return 'U' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
     }
 
     function forgotpassword()

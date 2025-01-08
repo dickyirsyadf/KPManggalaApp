@@ -35,7 +35,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -238,7 +238,7 @@
                     data: null,
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-sm btn-primary edit-btn" 
+                            <button class="btn btn-sm btn-primary edit-btn"
                                     data-bs-toggle="modal" data-bs-target="#modal-form-edit"
                                     data-id="${row.id}"
                                     data-nama="${row.nama}"
@@ -247,8 +247,8 @@
                                     data-hakakses="${row.id_hakakses}">
                                 Edit
                             </button>
-                            <button class="btn btn-sm btn-danger delete-btn" 
-                                    data-id="${row.id}" data-bs-toggle="modal" 
+                            <button class="btn btn-sm btn-danger delete-btn"
+                                    data-id="${row.id}" data-bs-toggle="modal"
                                     data-bs-target="#modal-delete">
                                 Delete
                             </button>

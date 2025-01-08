@@ -55,7 +55,7 @@ class PenggajianController extends Controller
 
             // Post to Penggajian table
             Penggajian::create([
-                'id' => $validated['id_karyawan'],
+                'id_karyawan' => $validated['id_karyawan'],
                 'nama' => $daftarGaji->nama,
                 'bagian' => $validated['bagian'],
                 'tgl_terima_gaji' => now()->toDateString(),
@@ -65,7 +65,7 @@ class PenggajianController extends Controller
 
             // Post to SlipGaji table
             SlipGaji::create([
-                'id' => $validated['id_karyawan'],
+                'id_karyawan' => $validated['id_karyawan'],
                 'nama' => $daftarGaji->nama,
                 'bagian' => $validated['bagian'],
                 'jumlah_hadir' => $validated['jumlah_hadir'],

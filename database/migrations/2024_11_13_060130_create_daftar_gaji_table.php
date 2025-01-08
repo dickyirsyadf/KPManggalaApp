@@ -11,14 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('penjualans', function (Blueprint $table) {
-            $table->string('id')->primary(); // Transaction ID (e.g., TRS202312001)
-            $table->unsignedBigInteger('id_karyawan'); // Foreign key for user (employee)
-            $table->date('tgl_penjualan'); // Sale date
-            $table->decimal('total_bayar', 15, 2); // Total amount paid
+        Schema::create('daftar_gaji', function (Blueprint $table) {
+            $table->id();
+            $table->string("id_karyawan");
+            $table->string("nama");
+            $table->string("bagian");
+            $table->integer('jumlah_hadir');
+            $table->integer("gaji_perhari");
+            $table->integer("absen");
+            $table->integer("bonus");
+            $table->integer("gaji_bersih");
             $table->timestamps();
 
-            // Foreign key constraint
             $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');
         });
     }
@@ -28,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('penjualans');
+        Schema::dropIfExists('daftar_gaji');
     }
 };

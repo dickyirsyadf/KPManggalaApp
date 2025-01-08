@@ -129,7 +129,7 @@
      $('#barangTable').DataTable({
          processing: true,
          serverSide: true,
-         ajax: "{{ route('barang.data') }}",
+         ajax: "{{ route('obat.data') }}",
          columns: [
              { data: 'nama', name: 'nama', searchable: true },
              { data: 'stock', name: 'stock' },
@@ -179,6 +179,10 @@
     $('.checkout-btn').on('click', function () {
         const rawTotal = totalPriceElement.data('raw-total'); // Get raw total
         $('#total-price-modal').val(rawTotal); // Set raw total in modal
+
+        // Clear the Jumlah Bayar and Kembalian fields
+        modalJumlahBayar.val('');
+        modalKembalian.val('');
     });
 
 
@@ -298,7 +302,7 @@
             total_bayar: totalPrice,
             bayar:jumlahBayar,
             kembalian:kembalian,
-            detail_penjualans: []
+            detail_penjualan: []
         };
 
         // Gather cart items
@@ -307,7 +311,7 @@
             const product = row.data('product');
             const price = parseInt(row.data('price'));
             const quantity = parseInt(row.find('.cart-quantity').val());
-            formData.detail_penjualans.push({
+            formData.detail_penjualan.push({
                 product,
                 harga_jual: price,
                 qty: quantity,
@@ -325,12 +329,19 @@
                 'X-CSRF-TOKEN': csrfToken, // Include CSRF token in the request headers
             },
             success: function (response) {
-                alert('Transaksi berhasil! Kembalian: ' + formatRupiah(kembalian));
-                $('#modal-form-checkout').modal('hide');
-                cartItems.empty();
-                totalPrice = 0;
-                updateTotalPrice();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Transaksi Berhasil!',
+                    text: 'Kembalian: ' + formatRupiah(kembalian),
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    $('#modal-form-checkout').modal('hide'); // Hide the modal
+                    cartItems.empty(); // Clear cart items
+                    totalPrice = 0; // Reset total price
+                    updateTotalPrice(); // Update total price display
+                });
             },
+
             error: function () {
                 alert('Terjadi kesalahan saat menyimpan data.');
             }

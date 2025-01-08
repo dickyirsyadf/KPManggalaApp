@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Barang;
+use App\Models\Obat;
 use App\Models\DetailPenjualan;
 use App\Models\Penjualan;
 use App\Models\Transaksi;
@@ -30,7 +30,7 @@ class PenjualanController extends Controller
                 'total_bayar' => 'required|numeric',
                 'bayar' => 'required|numeric',
                 'kembalian' => 'required|numeric',
-                'detail_penjualans' => 'required|array',
+                'detail_penjualan' => 'required|array',
             ]);
 
             // Generate unique ID for the transaction
@@ -61,7 +61,7 @@ class PenjualanController extends Controller
             // Insert into penjualan table with manually set transaction ID
             $penjualan = Penjualan::create([
                 'id' => $transactionId, // Manually set the transaction ID
-                'id_karyawan' => $validated['id_karyawan'],
+                'id_karyawan' => auth()->id(),
                 'tgl_penjualan' => now(),
                 'total_bayar' => $validated['total_bayar'],
             ]);
@@ -75,11 +75,11 @@ class PenjualanController extends Controller
 
             Log::info('Transaction ID: ' . $penjualan->id);  // Log the transaction ID to ensure it's being created
 
-            // Insert into detail_penjualans and update stock
+            // Insert into detail_penjualan and update stock
             $totalNominalTransaksi = 0;
-            foreach ($validated['detail_penjualans'] as $item) {
+            foreach ($validated['detail_penjualan'] as $item) {
                 // Look up the product in the database using its name
-                $barang = Barang::where('nama', $item['product'])->first();
+                $barang = Obat::where('nama', $item['product'])->first();
 
                 if (!$barang || $barang->stock < $item['qty']) {
                     // If stock is not sufficient, return error response
@@ -91,7 +91,7 @@ class PenjualanController extends Controller
                 // Insert each item into the detail_penjualan table
                 DetailPenjualan::create([
                     'id_penjualan' => $transactionId, // Associate with the correct transaction ID
-                    'id_barang' => $barang->id,
+                    'id_obat' => $barang->id,
                     'qty' => $item['qty'],
                     'harga' => $barang->harga_jual,
                     'subtotal' => $item['subtotal'],
@@ -116,6 +116,8 @@ class PenjualanController extends Controller
             return response()->json(['message' => 'Transaction completed successfully!'], 200);
         } catch (\Exception $e) {
             // Log the error with a detailed message
+
+
             Log::error('Error processing transaction: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all(),

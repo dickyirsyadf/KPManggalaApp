@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_karyawan')->unsigned();
+            $table->string('id_karyawan');
             $table->string('no_transaksi', 25)->nullable(false);
             $table->foreignId('id_jenis_transaksi')->nullable(false);
             $table->string('nominal_transaksi')->nullable(false);
             $table->datetime('tanggal_transaksi')->nullable(false);
             $table->timestamps();
 
+            $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('id_jenis_transaksi')->references('id')->on('jenis_transaksi');
         });
     }

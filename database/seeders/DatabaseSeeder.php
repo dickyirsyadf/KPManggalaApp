@@ -13,8 +13,7 @@ use App\Models\User;
 use App\Models\Jenis_Transaksi;
 use App\Models\Transaksi;
 use App\Models\Barang;
-
-
+use App\Models\Obat;
 
 class DatabaseSeeder extends Seeder
 {
@@ -44,9 +43,10 @@ class DatabaseSeeder extends Seeder
         User::factory()
             ->state(new Sequence(
                 [
+                    'id'=>'U0001',
                     'email' => 'admin@gmail.com',
                     'id_hakakses' => 1,
-                    'nama' => 'iniNamaAdmin',
+                    'nama' => 'Admin',
                     'no_hp' => '080000000000',
                     'password' => bcrypt('12341234')
                 ],
@@ -55,9 +55,10 @@ class DatabaseSeeder extends Seeder
         User::factory()
             ->state(new Sequence(
                 [
-                    'email' => 'superadmin@gmail.com',
+                    'id'=>'U0002',
+                    'email' => 'user@gmail.com',
                     'id_hakakses' => 2,
-                    'nama' => 'iniNamaSuperAdmin',
+                    'nama' => 'User',
                     'no_hp' => '088888888888',
                     'password' => bcrypt('12341234'),
                 ],
@@ -76,7 +77,7 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
 
-        // Seeder Barang
-        Barang::factory(50)->create();
+        // Seeder Obat
+        Obat::factory(50)->create();
     }
 }
