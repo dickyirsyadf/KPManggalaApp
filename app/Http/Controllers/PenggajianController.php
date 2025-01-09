@@ -48,7 +48,7 @@ class PenggajianController extends Controller
             // Log calculated values
             $penerimaan = $validated['jumlah_hadir'] * $validated['gaji_perhari'];
             $daysInMonth = now()->daysInMonth;
-            $potongan = ($daysInMonth - $validated['jumlah_hadir']) * 100000;
+            $potongan = $daftarGaji->absen * 50000;
             $total = $penerimaan - $potongan;
 
             Log::info('Calculated values:', compact('penerimaan', 'daysInMonth', 'potongan', 'total'));

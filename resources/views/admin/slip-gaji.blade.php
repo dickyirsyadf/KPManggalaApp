@@ -45,11 +45,33 @@
         .details p strong {
             color: #333;
         }
-        .totals {
+        .signatures {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .signature-block {
+            text-align: center;
+            width: 45%;
+        }
+        .signature-block p {
+            margin: 5px 0;
             font-size: 14px;
-            font-weight: bold;
-            text-align: right;
-            margin-top: 20px;
+        }
+        .signature-space {
+            height: 50px;
+            margin-top: 10px;
+            border-bottom: 1px solid #000;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .date {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 5px;
+            color: #333;
         }
         .footer {
             text-align: center;
@@ -80,6 +102,25 @@
             <p><strong>Penerimaan:</strong> Rp {{ number_format($slipGaji->penerimaan, 2, ',', '.') }}</p>
             <p><strong>Potongan:</strong> Rp {{ number_format($slipGaji->potongan, 2, ',', '.') }}</p>
             <p><strong>Total Gaji:</strong> Rp {{ number_format($slipGaji->total, 2, ',', '.') }}</p>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="signatures">
+            <!-- Disetujui -->
+            <div class="signature-block">
+                <p><strong>Disetujui</strong></p>
+                <p>(HR/Manager)</p>
+                <div class="signature-space"></div>
+            </div>
+            <!-- Diterima oleh -->
+            <div class="signature-block">
+                <div class="date">
+                    <p>{{ \Carbon\Carbon::now()->format('d M Y') }}</p>
+                </div>
+                <p><strong>Diterima oleh</strong></p>
+                <p>(Karyawan)</p>
+                <div class="signature-space"></div>
+            </div>
         </div>
 
         <!-- Footer Section -->

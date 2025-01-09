@@ -26,6 +26,11 @@
     <link rel="stylesheet" href="{{asset('assets/compiled/css/iconly.css')}}">
     <style>
 
+        /* Prevent dropdown overflow issues */
+        .sidebar-item {
+            overflow: visible; /* Allow dropdown to appear outside parent */
+        }
+
             /* Sidebar item with dropdown menu */
         .sidebar-item.dropdown {
             position: relative;
@@ -33,18 +38,16 @@
 
         /* Initially, hide the dropdown */
         .sidebar-item .dropdown-menu {
-            display: none;  /* Hide by default */
-            background-color: #f8f9fa; /* Background color for the dropdown */
-            border: 1px solid #ddd;
-            padding: 10px 0;
-            list-style: none;
-            width: 100%; /* Make it the same width as the sidebar */
-            margin-top: 5px; /* Slight space between menu and parent */
+            display: none; /* Hidden by default */
+            position: absolute; /* Ensures it's independent of the layout flow */
+            z-index: 1000; /* Stays above other elements */
+            margin-top: 5px; /* Creates a small gap between menu and parent */
+            width: 200px; /* Adjust width as needed */
         }
 
         /* Show the dropdown when hovering over the parent item */
         .sidebar-item.dropdown:hover .dropdown-menu {
-            display: block;  /* Make the dropdown visible */
+            display: block; /* Make dropdown visible */
         }
 
         /* Optional: Add hover effect for links inside the dropdown */
@@ -62,18 +65,26 @@
             display: block;
             margin-left: 0; /* Align to the left */
         }
+        /* Ensure body doesn't overflow */
+        body {
+            overflow-x: hidden;
+        }
+        /* Adjust for light mode */
         body[data-bs-theme="light"] .sidebar-item .dropdown-menu {
-            background-color: #f8f9fa; /* Light background for dropdown */
+            background-color: #f2f6ff; /* Light background */
             color: #000; /* Dark text */
             border: 1px solid #ddd;
         }
-
+        /* Adjust for dark mode */
         body[data-bs-theme="dark"] .sidebar-item .dropdown-menu {
-            background-color: #343a40; /* Dark background for dropdown */
+            background-color: #343a40; /* Dark background */
             color: #fff; /* Light text */
             border: 1px solid #454d55;
         }
-
+        /* Ensure dropdown hover background in light mode */
+        body[data-bs-theme="light"] .sidebar-item .dropdown-menu li a:hover {
+            background-color: #f2f6ff;
+        }
         body[data-bs-theme="dark"] .sidebar-item .dropdown-menu li a:hover {
             background-color: #565e68; /* Subtle hover effect in dark mode */
             color: #fff;
@@ -89,6 +100,67 @@
             -moz-appearance: textfield;
             appearance: textfield;
         }
+        /* Ensure cards and tables are responsive */
+        .card {
+            max-width: 100%;
+            overflow-x: auto; /* Ensure wide content scrolls instead of breaking layout */
+            box-sizing: border-box; /* Include padding in width calculations */
+            margin: 0 auto; /* Center card content */
+        }
+
+        .card table {
+            width: 100%; /* Ensure table adapts to parent width */
+            table-layout: auto; /* Allow flexible column resizing */
+            word-wrap: break-word; /* Handle long text in table cells */
+        }
+
+        table {
+            border-collapse: collapse; /* Cleaner table borders */
+            word-wrap: break-word; /* Break long text within cells */
+            max-width: 100%; /* Prevent table from exceeding container width */
+        }
+        @media (max-width: 768px) {
+            .card {
+                padding: 1rem; /* Smaller padding for smaller screens */
+            }
+
+            .card table {
+                font-size: 0.85rem; /* Adjust font size for better fit */
+            }
+        }
+        /* Sidebar default (hidden) */
+        .sidebar {
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed position for better behavior on toggle */
+            width: 250px; /* Adjust as needed */
+            height: 100%; /* Full height */
+            background-color: var(--bs-body-bg); /* Match body background */
+            z-index: 1050; /* Stay above other elements */
+            overflow-y: auto; /* Allow scrolling if needed */
+            transition: transform 0.3s ease; /* Smooth toggle effect */
+            transform: translateX(-100%); /* Hidden off-screen */
+        }
+
+        /* Sidebar visible */
+        .sidebar.active {
+            display: block;
+            transform: translateX(0); /* Slide into view */
+        }
+
+        /* For mobile: Full-width sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        /* Prevent overflow in light and dark modes */
+        body[data-bs-theme="light"] .card,
+        body[data-bs-theme="dark"] .card {
+            background-color: inherit; /* Match the theme's card background */
+            color: inherit; /* Match the theme's text color */
+        }
+
 
     </style>
 
@@ -105,18 +177,6 @@
         /* Hide scrollbar handle */
         ::-webkit-scrollbar-thumb {
             background-color: transparent;
-        }
-
-        #div-container-zakatmaal,
-        #div-container-zakatfitrah,
-        #div-container-zakatpenghasilan {
-            display: none;
-        }
-
-        #input-container-zakatmaal.show,
-        #input-container-zakatfitrah.show,
-        #input-container-zakatpenghasilan.show {
-            display: block;
         }
     </style>
 
@@ -169,7 +229,83 @@
         </div>
     </div>
 
-    <!-- <script src="{{asset('assets/extensions/jquery/jquery.min.js')}}"></script> -->
+    {{-- Theme --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const adjustCardWidths = () => {
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.style.width = '100%'; // Reset width for accurate recalculation
+                });
+            };
+
+            // Call on load and attach to resize event
+            adjustCardWidths();
+            window.addEventListener('resize', adjustCardWidths);
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Select all dropdown menus
+            const dropdownMenus = document.querySelectorAll(".sidebar-item .dropdown-menu");
+
+            // Ensure dropdowns are hidden on page load
+            dropdownMenus.forEach(menu => {
+                menu.style.display = "none";
+            });
+
+            // Add hover event listeners for better handling
+            const dropdownItems = document.querySelectorAll(".sidebar-item.dropdown");
+
+            dropdownItems.forEach(item => {
+                item.addEventListener("mouseenter", () => {
+                    const menu = item.querySelector(".dropdown-menu");
+                    if (menu) menu.style.display = "block";
+                });
+
+                item.addEventListener("mouseleave", () => {
+                    const menu = item.querySelector(".dropdown-menu");
+                    if (menu) menu.style.display = "none";
+                });
+            });
+        });
+        // Sidebar toggle for mobile
+        document.addEventListener("DOMContentLoaded", function () {
+            const burgerBtn = document.querySelector(".burger-btn"); // Ensure this matches your button class
+            const sidebar = document.querySelector(".sidebar"); // Ensure this matches your sidebar class
+
+            if (burgerBtn && sidebar) {
+                burgerBtn.addEventListener("click", () => {
+                    sidebar.classList.toggle("active");
+                });
+            }
+        });
+        // Debounce resize for performance
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        const handleResize = debounce(() => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.style.width = '100%';
+            });
+        }, 200);
+
+        window.addEventListener('resize', handleResize);
+
+        // Trigger on initial load
+        handleResize();
+
+    </script>
+
+
+    {{-- Clock --}}
     <script>
         function updateClock() {
             const now = new Date();
@@ -194,7 +330,7 @@
         // Panggil updateClock untuk pertama kali saat halaman dimuat
         updateClock();
     </script>
-
+    {{-- Spinner Loading --}}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
                 var spinner = document.getElementById("spinner");
@@ -210,43 +346,15 @@
                 }, 250); // 5000 milidetik = 5 detik
             });
     </script>
-
-
+    {{-- Assets --}}
     <script src="{{asset('assets/static/js/components/dark.js')}}"></script>
     <script src="{{asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')}}"></script>
-
-    <!-- <script src="{{asset('assets/compiled/js/app.js')}}"></script> -->
-
-
-
-    <!-- <script src="{{asset('assets/extensions/simple-datatables/umd/simple-datatables.js')}}"></script>
-    <script src="{{asset('assets/static/js/pages/simple-datatables.js')}}"></script> -->
-
+    {{-- <script src="{{asset('assets/compiled/js/app.js')}}"></script> --}}
     <script src="{{asset('assets/extensions/sweetalert2/sweetalert2.min.js')}}"></script>
-
-    <script
-        src="{{asset('assets/extensions/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js')}}">
-    </script>
-    <script
-        src="{{asset('assets/extensions/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-crop/filepond-plugin-image-crop.min.js')}}"></script>
-    <script
-        src="{{asset('assets/extensions/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-filter/filepond-plugin-image-filter.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-resize/filepond-plugin-image-resize.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond/filepond.js')}}"></script>
     <script src="{{asset('assets/extensions/toastify-js/src/toastify.js')}}"></script>
-    <script src="{{asset('assets/static/js/pages/filepond.js')}}"></script>
-
     <script src="{{asset('assets/extensions/flatpickr/flatpickr.min.js')}}"></script>
     <script src="{{asset('assets/static/js/pages/date-picker.js')}}"></script>
-
+    {{-- SWAL --}}
     @if(session()->has('error') || session()->has('success'))
     <script>
         @if(session()->has('error'))
@@ -264,7 +372,7 @@
             @endif
     </script>
     @endif
-
+    {{-- Fullscreen --}}
     <script>
         function toggleFullscreen() {
             const elem = document.documentElement;
