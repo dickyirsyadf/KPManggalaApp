@@ -1,0 +1,150 @@
+
+
+#spinner{
+    width: 3rem;
+    height: 3rem;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+}
+
+ /* Prevent dropdown overflow issues */
+  .sidebar-item {
+    overflow: visible; /* Allow dropdown to appear outside parent */
+}
+
+    /* Sidebar item with dropdown menu */
+.sidebar-item.dropdown {
+    position: relative;
+}
+
+/* Initially, hide the dropdown */
+.sidebar-item .dropdown-menu {
+    display: none; /* Hidden by default */
+    position: absolute; /* Ensures it's independent of the layout flow */
+    z-index: 1000; /* Stays above other elements */
+    margin-top: 5px; /* Creates a small gap between menu and parent */
+    width: 200px; /* Adjust width as needed */
+}
+
+/* Show the dropdown when hovering over the parent item */
+.sidebar-item.dropdown:hover .dropdown-menu {
+    display: block; /* Make dropdown visible */
+}
+
+/* Optional: Add hover effect for links inside the dropdown */
+.sidebar-item .dropdown-menu li a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Ensure the sidebar layout adjusts for the dropdown */
+.sidebar-menu .menu {
+    display: block;
+    transition: height 0.3s ease; /* Smooth transition */
+}
+
+.sidebar-item .dropdown-menu {
+    display: block;
+    margin-left: 0; /* Align to the left */
+}
+/* Ensure body doesn't overflow */
+body {
+    overflow-x: hidden;
+}
+/* Adjust for light mode */
+body[data-bs-theme="light"] .sidebar-item .dropdown-menu {
+    background-color: #f2f6ff; /* Light background */
+    color: #000; /* Dark text */
+    border: 1px solid #ddd;
+}
+/* Adjust for dark mode */
+body[data-bs-theme="dark"] .sidebar-item .dropdown-menu {
+    background-color: #343a40; /* Dark background */
+    color: #fff; /* Light text */
+    border: 1px solid #454d55;
+}
+/* Ensure dropdown hover background in light mode */
+body[data-bs-theme="light"] .sidebar-item .dropdown-menu li a:hover {
+    background-color: #f2f6ff;
+}
+body[data-bs-theme="dark"] .sidebar-item .dropdown-menu li a:hover {
+    background-color: #565e68; /* Subtle hover effect in dark mode */
+    color: #fff;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+/* Ensure cards and tables are responsive */
+.card {
+    max-width: 100%;
+    overflow-x: auto; /* Ensure wide content scrolls instead of breaking layout */
+    box-sizing: border-box; /* Include padding in width calculations */
+    margin: 0 auto; /* Center card content */
+}
+
+.card table {
+    width: 100%; /* Ensure table adapts to parent width */
+    table-layout: auto; /* Allow flexible column resizing */
+    word-wrap: break-word; /* Handle long text in table cells */
+}
+
+table {
+    border-collapse: collapse; /* Cleaner table borders */
+    word-wrap: break-word; /* Break long text within cells */
+    max-width: 100%; /* Prevent table from exceeding container width */
+}
+@media (max-width: 768px) {
+    .card {
+        padding: 1rem; /* Smaller padding for smaller screens */
+    }
+
+    .card table {
+        font-size: 0.85rem; /* Adjust font size for better fit */
+    }
+}
+/* Sidebar default (hidden) */
+.sidebar {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed position for better behavior on toggle */
+    width: 250px; /* Adjust as needed */
+    height: 100%; /* Full height */
+    background-color: var(--bs-body-bg); /* Match body background */
+    z-index: 1050; /* Stay above other elements */
+    overflow-y: auto; /* Allow scrolling if needed */
+    transition: transform 0.3s ease; /* Smooth toggle effect */
+    transform: translateX(-100%); /* Hidden off-screen */
+}
+
+/* Sidebar visible */
+.sidebar.active {
+    display: block;
+    transform: translateX(0); /* Slide into view */
+}
+
+/* For mobile: Full-width sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+    }
+}
+
+/* Prevent overflow in light and dark modes */
+body[data-bs-theme="light"] .card,
+body[data-bs-theme="dark"] .card {
+    background-color: inherit; /* Match the theme's card background */
+    color: inherit; /* Match the theme's text color */
+}
+
