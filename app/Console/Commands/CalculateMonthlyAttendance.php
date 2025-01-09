@@ -94,7 +94,7 @@ class CalculateMonthlyAttendance extends Command
                 $bonus = $attendedDays == $daysInMonth ? 100000 : 0;
 
                 // Calculate gaji_bersih
-                $gajiBersih = ($attendedDays * $gajiPerHari) + $bonus - ($jumlah_tidak_hadir * 100000);
+                $gajiBersih = ($attendedDays * $gajiPerHari) + $bonus - ($jumlah_tidak_hadir * 50000);
 
                 // Update DaftarGaji record
                 DaftarGaji::where('id_karyawan', $attendance->id_karyawan)
