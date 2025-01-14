@@ -14,86 +14,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <!-- Plugins -->
     <link rel="stylesheet" href="{{asset('assets/extensions/sweetalert2/sweetalert2.min.css')}}" />
-    <link rel="stylesheet" href="{{asset('assets/extensions/filepond/filepond.css')}}" />
-    <link rel="stylesheet"
-        href="{{asset('assets/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/extensions/toastify-js/src/toastify.css')}}" />
-
     <link rel="stylesheet" href="{{asset('assets/extensions/flatpickr/flatpickr.min.css')}}">
     <!-- Styling -->
+    <link rel="stylesheet" href="{{asset('assets/compiled/css/addons.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/compiled/css/app.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/compiled/css/app-dark.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/compiled/css/iconly.css')}}">
-    <style>
-
-            /* Sidebar item with dropdown menu */
-        .sidebar-item.dropdown {
-            position: relative;
-        }
-
-        /* Initially, hide the dropdown */
-        .sidebar-item .dropdown-menu {
-            display: none;  /* Hide by default */
-            background-color: #f8f9fa; /* Background color for the dropdown */
-            border: 1px solid #ddd;
-            padding: 10px 0;
-            list-style: none;
-            width: 100%; /* Make it the same width as the sidebar */
-            margin-top: 5px; /* Slight space between menu and parent */
-        }
-
-        /* Show the dropdown when hovering over the parent item */
-        .sidebar-item.dropdown:hover .dropdown-menu {
-            display: block;  /* Make the dropdown visible */
-        }
-
-        /* Optional: Add hover effect for links inside the dropdown */
-        .sidebar-item .dropdown-menu li a:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Ensure the sidebar layout adjusts for the dropdown */
-        .sidebar-menu .menu {
-            display: block;
-            transition: height 0.3s ease; /* Smooth transition */
-        }
-
-        .sidebar-item .dropdown-menu {
-            display: block;
-            margin-left: 0; /* Align to the left */
-        }
-        body[data-bs-theme="light"] .sidebar-item .dropdown-menu {
-            background-color: #f8f9fa; /* Light background for dropdown */
-            color: #000; /* Dark text */
-            border: 1px solid #ddd;
-        }
-
-        body[data-bs-theme="dark"] .sidebar-item .dropdown-menu {
-            background-color: #343a40; /* Dark background for dropdown */
-            color: #fff; /* Light text */
-            border: 1px solid #454d55;
-        }
-
-        body[data-bs-theme="dark"] .sidebar-item .dropdown-menu li a:hover {
-            background-color: #565e68; /* Subtle hover effect in dark mode */
-            color: #fff;
-        }
-
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type="number"] {
-            -moz-appearance: textfield;
-            appearance: textfield;
-        }
-
-    </style>
-
-
-
     <meta name="csrf-token" content="{{csrf_token()}}" />
 
     <style>
@@ -106,44 +33,19 @@
         ::-webkit-scrollbar-thumb {
             background-color: transparent;
         }
-
-        #div-container-zakatmaal,
-        #div-container-zakatfitrah,
-        #div-container-zakatpenghasilan {
-            display: none;
-        }
-
-        #input-container-zakatmaal.show,
-        #input-container-zakatfitrah.show,
-        #input-container-zakatpenghasilan.show {
-            display: block;
-        }
     </style>
 
 </head>
 
 <body>
 
-    <script src="{{asset('assets/static/js/initTheme.js')}}"></script>
-
-    <div id="spinner" class="spinner-border text-primary" style="
-                width: 3rem;
-                height: 3rem;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                z-index: 9999;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                visibility: hidden;
-            " role="status">
+    <div id="spinner" class="spinner-border text-primary" role="status">
     </div>
     <div id="app" style="display:none;">
 
         {{-- SIDEBAR --}}
 
-        @include('admin.layouts.sidebar')
+        @include('karyawan.layouts.sidebar')
 
         {{-- END OF SIDEBAR --}}
 
@@ -159,17 +61,89 @@
                     </a>
                 </div>
             </header>
+            {{-- CONTENT --}}
             @yield('admin-master')
-
+            {{-- END CONTENT --}}
             <footer>
-                {{-- <div class="footer clearfix mb-0 text-muted">
-
-                </div> --}}
+                <div class="footer clearfix mb-0 text-muted">
+                    <p>2025 &copy; Mangon App</p>
+                </div>
             </footer>
         </div>
     </div>
 
-    <!-- <script src="{{asset('assets/extensions/jquery/jquery.min.js')}}"></script> -->
+    {{-- Theme --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const adjustCardWidths = () => {
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.style.width = '100%'; // Reset width for accurate recalculation
+                });
+            };
+
+            // Call on load and attach to resize event
+            adjustCardWidths();
+            window.addEventListener('resize', adjustCardWidths);
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            // Select all dropdown menus
+            const dropdownMenus = document.querySelectorAll(".sidebar-item .dropdown-menu");
+
+            // Ensure dropdowns are hidden on page load
+            dropdownMenus.forEach(menu => {
+                menu.style.display = "none";
+            });
+
+            // Add hover event listeners for better handling
+            const dropdownItems = document.querySelectorAll(".sidebar-item.dropdown");
+
+            dropdownItems.forEach(item => {
+                item.addEventListener("mouseenter", () => {
+                    const menu = item.querySelector(".dropdown-menu");
+                    if (menu) menu.style.display = "block";
+                });
+
+                item.addEventListener("mouseleave", () => {
+                    const menu = item.querySelector(".dropdown-menu");
+                    if (menu) menu.style.display = "none";
+                });
+            });
+        });
+        // Sidebar toggle for mobile
+        document.addEventListener("DOMContentLoaded", function () {
+            const burgerBtn = document.querySelector(".burger-btn"); // Ensure this matches your button class
+            const sidebar = document.querySelector(".sidebar"); // Ensure this matches your sidebar class
+
+            if (burgerBtn && sidebar) {
+                burgerBtn.addEventListener("click", () => {
+                    sidebar.classList.toggle("active");
+                });
+            }
+        });
+        // Debounce resize for performance
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+        const handleResize = debounce(() => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.style.width = '100%';
+            });
+        }, 200);
+
+        window.addEventListener('resize', handleResize);
+
+        // Trigger on initial load
+        handleResize();
+
+    </script>
+    {{-- Clock --}}
     <script>
         function updateClock() {
             const now = new Date();
@@ -194,7 +168,7 @@
         // Panggil updateClock untuk pertama kali saat halaman dimuat
         updateClock();
     </script>
-
+    {{-- Spinner Loading --}}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
                 var spinner = document.getElementById("spinner");
@@ -210,43 +184,16 @@
                 }, 250); // 5000 milidetik = 5 detik
             });
     </script>
-
-
+    {{-- Assets --}}
+    <script src="{{asset('assets/static/js/initTheme.js')}}"></script>
     <script src="{{asset('assets/static/js/components/dark.js')}}"></script>
     <script src="{{asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')}}"></script>
-
-    <!-- <script src="{{asset('assets/compiled/js/app.js')}}"></script> -->
-
-
-
-    <!-- <script src="{{asset('assets/extensions/simple-datatables/umd/simple-datatables.js')}}"></script>
-    <script src="{{asset('assets/static/js/pages/simple-datatables.js')}}"></script> -->
-
+    <script src="{{asset('assets/compiled/js/app.js')}}"></script>
     <script src="{{asset('assets/extensions/sweetalert2/sweetalert2.min.js')}}"></script>
-
-    <script
-        src="{{asset('assets/extensions/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js')}}">
-    </script>
-    <script
-        src="{{asset('assets/extensions/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-crop/filepond-plugin-image-crop.min.js')}}"></script>
-    <script
-        src="{{asset('assets/extensions/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-filter/filepond-plugin-image-filter.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond-plugin-image-resize/filepond-plugin-image-resize.min.js')}}">
-    </script>
-    <script src="{{asset('assets/extensions/filepond/filepond.js')}}"></script>
     <script src="{{asset('assets/extensions/toastify-js/src/toastify.js')}}"></script>
-    <script src="{{asset('assets/static/js/pages/filepond.js')}}"></script>
-
     <script src="{{asset('assets/extensions/flatpickr/flatpickr.min.js')}}"></script>
     <script src="{{asset('assets/static/js/pages/date-picker.js')}}"></script>
-
+    {{-- SWAL --}}
     @if(session()->has('error') || session()->has('success'))
     <script>
         @if(session()->has('error'))
@@ -264,7 +211,7 @@
             @endif
     </script>
     @endif
-
+    {{-- Fullscreen --}}
     <script>
         function toggleFullscreen() {
             const elem = document.documentElement;

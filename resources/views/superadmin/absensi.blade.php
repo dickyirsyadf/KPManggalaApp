@@ -1,4 +1,4 @@
-@extends('admin.layouts.admin-master')
+@extends('superadmin.layouts.admin-master')
 
 @section('admin-master')
 <div class="page-heading">

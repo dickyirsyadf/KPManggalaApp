@@ -1,4 +1,11 @@
 
+.stats-content span {
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds '...' if content overflows */
+    width: 100px; /* Adjust width as needed */
+    display: inline-block; /* Ensures the width takes effect */
+}
 
 #spinner{
     width: 3rem;

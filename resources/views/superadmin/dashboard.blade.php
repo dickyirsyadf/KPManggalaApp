@@ -1,356 +1,73 @@
 @extends('superadmin.layouts.superadmin-master')
-@section('superadmin-master')
+@section('admin-master')
 <div class="page-heading ">
-    {{-- <h3>Profile Statistics</h3> --}}
-    <h4 class="text-end" id="realtime-clock"></h4>
 </div>
 <div class="page-content">
     <section class="row">
         <div class="col-12 ">
             <div class="row">
-                {{-- zakat --}}
-                <div class="col-6 col-lg-3 col-md-6">
+                <div class="col-12">
                     <div class="card">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon purple mb-2">
-                                        <i class="iconly-boldPaper"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">
-                                        Zakat
-                                    </h6>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Hari Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Minggu Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Bulan Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- infaq --}}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon blue mb-2">
-                                        <i class="iconly-boldProfile"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Infaq </h6>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Hari Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Minggu Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Bulan Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- sedekah --}}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon green mb-2">
-                                        <i class="iconly-boldAdd-User"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Sedekah</h6>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Hari Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Minggu Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Bulan Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- fidyah --}}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon red mb-2">
-                                        <i class="iconly-boldBookmark"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Fidyah</h6>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Hari Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Minggu Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="font-extrabold mb-0">Bulan Ini</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <h6 class="font-extrabold mb-0 text-end">862</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body px-8 py-4-5">
+                            <h3 style="text-align: center">Selamat Datang di Mangony APP !</h3>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- <div class="row">
-                <div class="col-12">
+            <div class="row">
+                {{-- Penjualan --}}
+                <div class="col-12 col-lg-6">
                     <div class="card">
-                        <div class="card-header">
-                            <h4>Profile Visit</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="chart-profile-visit"></div>
+                        <div class="card-body px-4 py-4-5">
+                            <div class="d-flex align-items-center">
+                                <div class="stats-icon purple mb-2">
+                                    <i class="iconly-boldPaper"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="text-muted font-semibold">Penjualan</h6>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Hari Ini</span>
+                                        <span class="font-extrabold ms-3">{{ $hariIni }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Minggu Ini</span>
+                                        <span class="font-extrabold ms-3">{{ $mingguIni }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Bulan Ini</span>
+                                        <span class="font-extrabold ms-3">{{ $bulanIni }}</span>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div> --}}
-            {{-- <div class="row">
-                <div class="col-12 col-xl-4">
+                {{-- Absensi --}}
+                <div class="col-12 col-lg-6">
                     <div class="card">
-                        <div class="card-header">
-                            <h4>Profile Visit</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-7">
-                                    <div class="d-flex align-items-center">
-                                        <svg class="bi text-primary" width="32" height="32" fill="blue"
-                                            style="width: 10px">
-                                            <use xlink:href="assets/static/images/bootstrap-icons.svg#circle-fill" />
-                                        </svg>
-                                        <h5 class="mb-0 ms-3">Europe</h5>
-                                    </div>
+                        <div class="card-body px-4 py-4-5">
+                            <div class="d-flex align-items-center">
+                                <div class="stats-icon green mb-2">
+                                    <i class="iconly-boldAdd-User"></i>
                                 </div>
-                                <div class="col-5">
-                                    <h5 class="mb-0 text-end">862</h5>
-                                </div>
-                                <div class="col-12">
-                                    <div id="chart-europe"></div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-7">
-                                    <div class="d-flex align-items-center">
-                                        <svg class="bi text-success" width="32" height="32" fill="blue"
-                                            style="width: 10px">
-                                            <use xlink:href="assets/static/images/bootstrap-icons.svg#circle-fill" />
-                                        </svg>
-                                        <h5 class="mb-0 ms-3">America</h5>
-                                    </div>
-                                </div>
-                                <div class="col-5">
-                                    <h5 class="mb-0 text-end">375</h5>
-                                </div>
-                                <div class="col-12">
-                                    <div id="chart-america"></div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-7">
-                                    <div class="d-flex align-items-center">
-                                        <svg class="bi text-danger" width="32" height="32" fill="blue"
-                                            style="width: 10px">
-                                            <use xlink:href="assets/static/images/bootstrap-icons.svg#circle-fill" />
-                                        </svg>
-                                        <h5 class="mb-0 ms-3">Indonesia</h5>
-                                    </div>
-                                </div>
-                                <div class="col-5">
-                                    <h5 class="mb-0 text-end">1025</h5>
-                                </div>
-                                <div class="col-12">
-                                    <div id="chart-indonesia"></div>
+                                <div class="ms-3">
+                                    <h6 class="text-muted font-semibold">Absensi</h6>
+                                    @if ($hasCheckedIn === 'yes')
+                                        <h6 class="font-extrabold text-success">Sudah Absen</h6>
+                                    @else
+                                        <h6 class="font-extrabold text-danger">Belum Absen</h6>
+                                        <a href="{{ route('absensi.index') }}" class="btn btn-primary mt-2">Menuju Absensi</a>
+                                    @endif
+
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> --}}
-                {{-- <div class="col-12 col-xl-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Latest Comments</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Comment</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-md">
-                                                        <img src="./assets/compiled/jpg/5.jpg" />
-                                                    </div>
-                                                    <p class="font-bold ms-3 mb-0">Si Cantik</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class="mb-0">
-                                                    Congratulations on your graduation!
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-md">
-                                                        <img src="./assets/compiled/jpg/2.jpg" />
-                                                    </div>
-                                                    <p class="font-bold ms-3 mb-0">Si Ganteng</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class="mb-0">
-                                                    Wow amazing design! Can you make another
-                                                    tutorial for this design?
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
+                </div>
             </div>
         </div>
     </section>
 </div>
-
-<script>
-    function updateClock() {
-        const now = new Date();
-        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const dayOfWeek = days[now.getDay()];
-        const date = now.getDate().toString().padStart(2, '0');
-        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Bulan dimulai dari 0, jadi tambahkan 1
-        const year = now.getFullYear();
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const seconds = now.getSeconds().toString().padStart(2, '0');
-
-        const formattedTime = `${dayOfWeek} | ${date}-${month}-${year} , ${hours}:${minutes}:${seconds}`;
-
-        const clockElement = document.getElementById('realtime-clock');
-        clockElement.textContent = formattedTime;
-    }
-
-    // Panggil updateClock setiap detik
-    setInterval(updateClock, 1000);
-
-    // Panggil updateClock untuk pertama kali saat halaman dimuat
-    updateClock();
-</script>
 @endsection

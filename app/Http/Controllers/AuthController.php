@@ -46,9 +46,11 @@ class AuthController extends Controller
                         'no_transaksi' => 'Login',
                         'tanggal' => $dateNow
                     ]);
-                    // dd(auth()->user()->id);
                     return redirect()->intended('admin/dashboard');
                 } elseif ($user->id_hakakses === 2) {
+                    $request->session()->regenerate();
+                    return redirect()->intended('karyawan/dashboard');
+                } else{
                     $request->session()->regenerate();
                     return redirect()->intended('superadmin/dashboard');
                 }

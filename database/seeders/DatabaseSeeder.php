@@ -33,6 +33,11 @@ class DatabaseSeeder extends Seeder
                 ['hakakses' => 'user']
             ))
             ->create();
+        HakAkses::factory()
+            ->state(new Sequence(
+                ['hakakses' => 'Super Admin']
+            ))
+            ->create();
         // HakAkses::factory()
         //     ->state(new Sequence(
         //         ['hakakses' => 'super admin']
@@ -58,6 +63,18 @@ class DatabaseSeeder extends Seeder
                     'id'=>'U0002',
                     'email' => 'user@gmail.com',
                     'id_hakakses' => 2,
+                    'nama' => 'User',
+                    'no_hp' => '088888888888',
+                    'password' => bcrypt('12341234'),
+                ],
+            ))
+            ->create();
+        User::factory()
+            ->state(new Sequence(
+                [
+                    'id'=>'U0003',
+                    'email' => 'super@gmail.com',
+                    'id_hakakses' => 3,
                     'nama' => 'User',
                     'no_hp' => '088888888888',
                     'password' => bcrypt('12341234'),
