@@ -103,7 +103,7 @@
                         <span class="d-none d-sm-block">Close</span>
                     </button>
                     <button type="submit" class="btn btn-primary ms-1">
-                        Submit
+                        Bayar
                     </button>
                 </div>
             </form>
@@ -335,12 +335,18 @@
                     text: 'Kembalian: ' + formatRupiah(kembalian),
                     confirmButtonText: 'OK',
                 }).then(() => {
+                    // Properly hide the modal and remove the backdrop
                     $('#modal-form-checkout').modal('hide'); // Hide the modal
+                    $('body').removeClass('modal-open'); // Remove the 'modal-open' class from <body>
+                    $('.modal-backdrop').remove(); // Remove the modal backdrop
+
+                    // Clear cart items and reset total price
                     cartItems.empty(); // Clear cart items
                     totalPrice = 0; // Reset total price
                     updateTotalPrice(); // Update total price display
                 });
             },
+
 
             error: function () {
                 alert('Terjadi kesalahan saat menyimpan data.');

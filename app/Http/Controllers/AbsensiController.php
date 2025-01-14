@@ -36,7 +36,7 @@ class AbsensiController extends Controller
         public function update(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:absensis,id',
+            'id' => 'required|exists:absensi,id',
             'tanggal' => 'required|date',
             'kehadiran' => 'required|boolean',
             'admin_password' => 'required',

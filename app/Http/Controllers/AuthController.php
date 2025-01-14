@@ -85,16 +85,17 @@ class AuthController extends Controller
             $user = User::create($credentials);
             return redirect('/')->with('success', 'Daftar Akun Berhasil!');
         } catch (Exception $e) {
-            // dd($e->getMessage());
+             dd($e->getMessage());
             return back()->with('error', 'Daftar Akun Gagal. Isi Form Pendaftaran Dengan Benar!!');
         }
     }
     private function generateUserId()
     {
         $lastUser = User::orderBy('id', 'desc')->first();
-        $lastId = $lastUser ? intval(substr($lastUser->id, 1)) : 0; // Strip 'U' and get numeric part
-        return 'U' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
+        $lastId = $lastUser ? intval(substr($lastUser->id, 1)) : 0; // Remove 'U' and get the numeric part
+        return 'U' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT); // Add leading zeros to make it 'U000x'
     }
+
 
     function forgotpassword()
     {

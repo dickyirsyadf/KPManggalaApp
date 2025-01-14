@@ -150,14 +150,17 @@ class DaftarGajiController extends Controller
      */
     public function destroy($id)
     {
-        try{
-            $gaji = DaftarGaji::findOrFail($id);
+        try {
+            $gaji = DaftarGaji::where('id_karyawan', $id)->firstOrFail();
             $gaji->delete();
 
-            // Return a success response
-            return back()->with('success', 'Hapus Daftar Gaji Berhasil !');
-        }catch(Exception $e){
-            return back()->with('error', 'Hapus Daftar Gaji Gagal! Data Tidak Ditemukan');
+            return back()->with('success', 'Hapus Daftar Gaji Berhasil!');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return back()->with('error', 'Data tidak ditemukan!');
+        } catch (\Exception $e) {
+            Log::error("Error deleting Daftar Gaji: " . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menghapus data!');
         }
     }
+
 }

@@ -24,6 +24,7 @@ class User extends Authenticatable
     protected $keyType = 'string'; // Use string for the primary key type
 
     protected $fillable = [
+        'id',
         'nama',
         'email',
         'no_hp',

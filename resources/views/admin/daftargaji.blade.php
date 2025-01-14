@@ -183,7 +183,7 @@
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
                             <input type="text" class="form-control" placeholder="Nama Karyawan" name="nama_karyawan" id="nama_karyawan" required
-                                autocomplete="default">
+                                autocomplete="default" readonly>
                             <div class="form-control-icon">
                                 <i class="bi bi-basket-fill"></i>
                             </div>
@@ -192,7 +192,7 @@
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
                             <input type="text" class="form-control" placeholder="bagian" id="fbagian" name="fbagian" required
-                                autocomplete="default">
+                                autocomplete="default" readonly>
                             <div class="form-control-icon">
                                 <i class="bi bi-card-list"></i>
                             </div>
@@ -269,7 +269,7 @@
                                 Edit
                             </button>
                             <button class="btn btn-sm btn-danger delete-btn"
-                                    data-id="${row.id}" data-bs-toggle="modal"
+                                    data-id="${row.id_karyawan}" data-bs-toggle="modal"
                                     data-bs-target="#modal-delete">
                                 Delete
                             </button>
@@ -324,7 +324,7 @@
 <!-- Delete Data -->
 <script>
      $('#gajiTable').on('click', '.delete-btn', function () {
-        var id = $(this).data('id_karyawan');
+        var id = $(this).data('id');
         var name = $(this).data('nama');
 
         // Set the item name in the modal
