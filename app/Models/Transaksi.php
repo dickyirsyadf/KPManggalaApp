@@ -22,17 +22,24 @@ class Transaksi extends Model
 
     public static function getHariIni()
     {
-        return self::whereDate('created_at', Carbon::today())->count();
+        return self::where('id_jenis_transaksi', 1)
+            ->whereDate('created_at', now()->toDateString())
+            ->count();
     }
+
     public static function getMingguIni()
     {
-        return self::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+        return self::where('id_jenis_transaksi', 1)
+            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
     }
+
     public static function getBulanIni()
     {
-        return self::whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year)
-                    ->count();
+        return self::where('id_jenis_transaksi', 1)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
     }
 
     function jenis_transaksi()

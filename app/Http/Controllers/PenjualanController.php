@@ -34,7 +34,7 @@ class PenjualanController extends Controller
             ]);
 
             // Generate unique ID for the transaction
-            $today = now()->format('Ymd');  // Format date to Ymd (e.g., 20250102)
+            $today = now()->format('dmY');  // Format date to dmY (e.g., 15012025)
 
             // Attempt to find the latest transaction of today, if any
             $lastTransaction = Penjualan::whereDate('tgl_penjualan', now())->latest()->first();

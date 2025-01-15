@@ -116,7 +116,7 @@ class PenggajianController extends Controller
         foreach ($daftarGajiRecords as $daftar) {
             $daysInMonth = now()->daysInMonth;
             $penerimaan = $daftar->jumlah_hadir * $daftar->gaji_perhari;
-            $potongan = ($daysInMonth - $daftar->jumlah_hadir) * 100000;
+            $potongan = ($daysInMonth - $daftar->jumlah_hadir) * 50000;
             $total = $penerimaan - $potongan;
 
             SlipGaji::create([

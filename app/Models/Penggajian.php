@@ -10,4 +10,9 @@ class Penggajian extends Model
     use HasFactory;
     protected $fillable = ['id_karyawan', 'nama', 'bagian', 'tgl_terima_gaji'];
     protected $table = 'penggajian';
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'id'); // Correct foreign key
+    }
 }
