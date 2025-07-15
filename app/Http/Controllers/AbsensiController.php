@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AbsensiController extends Controller
 {
@@ -21,70 +22,107 @@ class AbsensiController extends Controller
     }
 
     /**
-     * Method ini menangani Jam Masuk/Keluar dengan logika keterlambatan dan lembur.
+     * Method terpusat untuk memproses semua jenis absensi.
      */
-    public function store(Request $request)
+    public function process(Request $request)
     {
         $request->validate([
             'id_karyawan' => 'required|exists:users,id',
             'tanggal' => 'required|date',
+            'action_type' => ['required', Rule::in(['kehadiran', 'status'])],
+            'status' => ['nullable', Rule::in(['Sakit', 'Izin'])],
         ]);
 
-        $absensi = Absensi::where('id_karyawan', $request->id_karyawan)
-                           ->where('tanggal', $request->tanggal)
-                           ->first();
+        $actionType = $request->input('action_type');
+        $id_karyawan = $request->input('id_karyawan');
+        $tanggal = $request->input('tanggal');
 
-        // Menggunakan zona waktu Jakarta (WIB)
+        $existingAbsensi = Absensi::where('id_karyawan', $id_karyawan)
+                                   ->where('tanggal', $tanggal)
+                                   ->first();
+
+        if ($actionType === 'status') {
+            if ($existingAbsensi) {
+                return back()->with('error', 'Karyawan sudah memiliki data absensi pada tanggal tersebut.');
+            }
+            return $this->handleSakitIzin($id_karyawan, $tanggal, $request->input('status'));
+        }
+
+        if ($actionType === 'kehadiran') {
+            if ($existingAbsensi && in_array($existingAbsensi->keterangan, ['Sakit', 'Izin'])) {
+                return back()->with('error', 'Karyawan sudah ditandai ' . $existingAbsensi->keterangan . ' untuk hari ini.');
+            }
+            if (!$existingAbsensi) {
+                return $this->handleHadir($id_karyawan, $tanggal);
+            }
+            if ($existingAbsensi && is_null($existingAbsensi->jam_keluar)) {
+                return $this->handlePulang($existingAbsensi);
+            }
+            return back()->with('error', 'Karyawan ini sudah selesai absen untuk hari yang dipilih.');
+        }
+
+        return back()->with('error', 'Aksi tidak valid.');
+    }
+
+    private function handleHadir($id_karyawan, $tanggal)
+    {
         $timezone = 'Asia/Jakarta';
         $currentTime = now($timezone);
-        $batasWaktuMasuk = Carbon::parse($request->tanggal . ' 09:15:00', $timezone);
-        $batasWaktuLembur = Carbon::parse($request->tanggal . ' 17:30:00', $timezone);
+        $batasWaktuMasuk = Carbon::parse($tanggal . ' 09:15:00', $timezone);
 
-        // KASUS 1: Absen Masuk
-        if (!$absensi) {
-            Absensi::create([
-                'id_karyawan' => $request->id_karyawan,
-                'tanggal' => $request->tanggal,
-                'jam_masuk' => $currentTime->format('H:i:s'),
-                'kehadiran' => null, // Ditentukan saat absen pulang
-                'keterangan' => $currentTime->gt($batasWaktuMasuk) ? 'Terlambat' : null,
-            ]);
-            return redirect()->route('absensi.index')->with('success', 'Berhasil melakukan absensi masuk.');
+        Absensi::create([
+            'id_karyawan' => $id_karyawan,
+            'tanggal' => $tanggal,
+            'jam_masuk' => $currentTime->format('H:i:s'),
+            'kehadiran' => null,
+            'keterangan' => $currentTime->gt($batasWaktuMasuk) ? 'Terlambat' : null,
+        ]);
+        return redirect()->route('absensi.index')->with('success', 'Berhasil melakukan absensi masuk.');
+    }
+
+    private function handlePulang(Absensi $absensi)
+    {
+        $timezone = 'Asia/Jakarta';
+        $currentTime = now($timezone);
+        $batasWaktuLembur = Carbon::parse($absensi->tanggal . ' 17:30:00', $timezone);
+
+        $absensi->jam_keluar = $currentTime->format('H:i:s');
+        $absensi->kehadiran = 1;
+
+        $keterangan = [];
+        if (str_contains($absensi->keterangan ?? '', 'Terlambat')) {
+            $keterangan[] = 'Terlambat';
+        }
+        if ($currentTime->gt($batasWaktuLembur)) {
+            $keterangan[] = 'Lembur';
         }
 
-        // KASUS 2: Absen Pulang
-        if ($absensi && is_null($absensi->jam_keluar)) {
-            $absensi->jam_keluar = $currentTime->format('H:i:s');
-            $absensi->kehadiran = 1; // Jika sudah absen pulang, dianggap hadir.
+        $absensi->keterangan = !empty($keterangan) ? implode(', ', $keterangan) : null;
+        $absensi->save();
+        return redirect()->route('absensi.index')->with('success', 'Berhasil melakukan absensi pulang.');
+    }
 
-            $keterangan = [];
-            // Cek apakah saat masuk sudah tercatat terlambat
-            if (str_contains($absensi->keterangan ?? '', 'Terlambat')) {
-                $keterangan[] = 'Terlambat';
-            }
-            // Cek apakah sekarang lembur
-            if ($currentTime->gt($batasWaktuLembur)) {
-                $keterangan[] = 'Lembur';
-            }
-
-            $absensi->keterangan = !empty($keterangan) ? implode(', ', $keterangan) : null;
-
-            $absensi->save();
-            return redirect()->route('absensi.index')->with('success', 'Berhasil melakukan absensi pulang.');
-        }
-
-        return redirect()->route('absensi.index')->with('error', 'Karyawan ini sudah selesai absen untuk hari yang dipilih.');
+    private function handleSakitIzin($id_karyawan, $tanggal, $status)
+    {
+        Absensi::create([
+            'id_karyawan' => $id_karyawan,
+            'tanggal' => $tanggal,
+            'kehadiran' => 0,
+            'keterangan' => $status,
+        ]);
+        return redirect()->route('absensi.index')->with('success', 'Status ' . $status . ' berhasil dicatat.');
     }
 
     /**
-     * Method untuk update data absensi dari modal dengan logika yang diperbaiki.
+     * Method update yang disempurnakan untuk menangani semua kasus edit.
      */
     public function update(Request $request)
     {
         $request->validate([
             'id' => 'required|exists:absensi,id',
             'tanggal' => 'required|date',
-            'jam_masuk' => 'required',
+            'edit_status' => ['nullable', Rule::in(['Sakit', 'Izin'])],
+            'jam_masuk' => 'nullable',
             'jam_keluar' => 'nullable',
             'admin_password' => 'required',
         ]);
@@ -94,58 +132,61 @@ class AbsensiController extends Controller
         }
 
         $absensi = Absensi::findOrFail($request->id);
+        $status = $request->edit_status;
 
-        // 1. Perbarui data dasar dari request
-        $absensi->tanggal = $request->tanggal;
-        $absensi->jam_masuk = $request->jam_masuk;
-        $absensi->jam_keluar = $request->jam_keluar;
+        // Jika status diubah menjadi Sakit atau Izin
+        if ($status === 'Sakit' || $status === 'Izin') {
+            $absensi->update([
+                'tanggal' => $request->tanggal,
+                'kehadiran' => 0,
+                'keterangan' => $status,
+                'jam_masuk' => null,
+                'jam_keluar' => null,
+            ]);
+        } else { // Jika status tetap Hadir (hanya edit waktu)
+            $timezone = 'Asia/Jakarta';
+            $keteranganFinal = [];
 
-        // 2. Hitung ulang semua status dari awal menggunakan zona waktu Jakarta
-        $timezone = 'Asia/Jakarta';
-        $keteranganFinal = [];
-
-        // Cek status "Terlambat" berdasarkan jam masuk yang baru
-        $jamMasukInput = Carbon::parse($request->tanggal . ' ' . $request->jam_masuk, $timezone);
-        $batasWaktuMasuk = Carbon::parse($request->tanggal . ' 09:15:00', $timezone);
-        if($jamMasukInput->gt($batasWaktuMasuk)){
-            $keteranganFinal[] = 'Terlambat';
-        }
-
-        // Cek status "Hadir" dan "Lembur" berdasarkan jam keluar yang baru
-        if ($request->filled('jam_keluar') && $request->jam_keluar) {
-            $absensi->kehadiran = 1; // Dianggap hadir jika ada jam keluar
-
-            // Cek status "Lembur"
-            $jamKeluarInput = Carbon::parse($request->tanggal . ' ' . $request->jam_keluar, $timezone);
-            $batasWaktuLembur = Carbon::parse($request->tanggal . ' 17:30:00', $timezone);
-            if($jamKeluarInput->gt($batasWaktuLembur)){
-                $keteranganFinal[] = 'Lembur';
+            if($request->filled('jam_masuk')){
+                $jamMasukInput = Carbon::parse($request->tanggal . ' ' . $request->jam_masuk, $timezone);
+                $batasWaktuMasuk = Carbon::parse($request->tanggal . ' 09:15:00', $timezone);
+                if ($jamMasukInput->gt($batasWaktuMasuk)) {
+                    $keteranganFinal[] = 'Terlambat';
+                }
             }
-        } else {
-            // Jika tidak ada jam keluar, status kehadiran belum final
-            $absensi->kehadiran = null;
+
+            $kehadiran = null;
+            if ($request->filled('jam_keluar')) {
+                $kehadiran = 1;
+                $jamKeluarInput = Carbon::parse($request->tanggal . ' ' . $request->jam_keluar, $timezone);
+                $batasWaktuLembur = Carbon::parse($request->tanggal . ' 17:30:00', $timezone);
+                if ($jamKeluarInput->gt($batasWaktuLembur)) {
+                    $keteranganFinal[] = 'Lembur';
+                }
+            }
+
+            $absensi->update([
+                'tanggal' => $request->tanggal,
+                'jam_masuk' => $request->jam_masuk,
+                'jam_keluar' => $request->jam_keluar,
+                'kehadiran' => $kehadiran,
+                'keterangan' => !empty($keteranganFinal) ? implode(', ', $keteranganFinal) : null,
+            ]);
         }
-
-        // 3. Simpan keterangan yang sudah final
-        $absensi->keterangan = !empty($keteranganFinal) ? implode(', ', $keteranganFinal) : null;
-
-        // 4. Simpan semua perubahan ke database
-        $absensi->save();
 
         return redirect()->route('absensi.index')->with('success', 'Data absensi berhasil diperbarui.');
     }
 
-    /**
-     * Method untuk mengecek status absensi via AJAX.
-     */
     public function cekStatusAbsensi(User $user, $tanggal)
     {
         $absensi = Absensi::where('id_karyawan', $user->id)
-                           ->where('tanggal', $tanggal)
+                           ->where('tanggal', 'like', $tanggal . '%')
                            ->first();
-
         if (!$absensi) {
             return response()->json(['text' => 'Proses Absen Masuk', 'disabled' => false]);
+        }
+        if (in_array($absensi->keterangan, ['Sakit', 'Izin'])) {
+            return response()->json(['text' => 'Status: ' . $absensi->keterangan, 'disabled' => true]);
         }
         if (is_null($absensi->jam_keluar)) {
             return response()->json(['text' => 'Proses Absen Pulang', 'disabled' => false]);

@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string("id_karyawan");
             $table->string("nama");
             $table->string("jabatan");
-            // $table->string("periode_gaji");
-            // $table->string("tanggal_hitung_gaji");
             $table->integer('gaji_pokok');
             $table->integer("jml_hr_kerja");
             $table->integer("jml_hadir");
@@ -26,7 +24,6 @@ return new class extends Migration
             $table->integer("jml_sakit");
             $table->integer("jml_terlambat");
             $table->integer("jml_lembur");
-            $table->integer("gaji_bersih");
             $table->timestamps();
 
             $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');

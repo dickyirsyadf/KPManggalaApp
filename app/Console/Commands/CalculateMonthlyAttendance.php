@@ -4,11 +4,13 @@ namespace App\Console\Commands;
 
 use App\Models\Absensi;
 use App\Models\DaftarGaji;
+use App\Models\Potongan;
+use App\Models\Tunjangan;
 use App\Models\User;
 use Illuminate\Console\Command;
-use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class CalculateMonthlyAttendance extends Command
 {
@@ -26,11 +28,6 @@ class CalculateMonthlyAttendance extends Command
      */
     protected $description = 'Menghitung absensi bulanan dan memperbarui rincian gaji untuk semua karyawan.';
 
-    // Tarif bisa Anda sesuaikan atau pindahkan ke database/config
-    const RATE_LEMBUR = 30000;
-    const POTONGAN_TELAT = 25000;
-    const POTONGAN_ABSEN = 50000; // Potongan untuk tidak masuk tanpa keterangan
-
     /**
      * Execute the console command.
      */
@@ -46,18 +43,25 @@ class CalculateMonthlyAttendance extends Command
             $tahun = $periode->year;
             $periodeString = $periode->format('Y-m');
 
+            // Mengambil data potongan dari tabel potongan.
+            $potongan = Potongan::first();
+            $potongan_telat = $potongan->potongan_terlambat ?? 0;
+            $potongan_absen = $potongan->potongan_absensi ?? 0;
+
+            $this->info("Menggunakan Potongan Telat: {$potongan_telat}");
+            $this->info("Menggunakan Potongan Absen: {$potongan_absen}");
+
             // Menghitung hari kerja efektif (Senin-Sabtu)
             $hariKerja = 0;
             $startOfMonth = $periode->copy()->startOfMonth();
             $endOfMonth = $periode->copy()->endOfMonth();
 
             for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
-                if (!$date->isSunday()) { // Menghitung Senin sampai Sabtu
+                if (!$date->isSunday()) {
                     $hariKerja++;
                 }
             }
 
-            // Ambil semua karyawan yang sudah ada di daftar gaji
             $daftarKaryawan = DaftarGaji::all();
 
             if ($daftarKaryawan->isEmpty()) {
@@ -76,47 +80,44 @@ class CalculateMonthlyAttendance extends Command
                     ->get();
 
                 // 2. Hitung semua komponen kehadiran
-                $jml_hadir = $absensiData->where('kehadiran', 1)->count();
-                $jml_terlambat = $absensiData->where('keterangan', 'like', '%Terlambat%')->count();
-                $jml_lembur = $absensiData->where('keterangan', 'like', '%Lembur%')->count();
+                $jml_hadir_aktual = $absensiData->where('kehadiran', 1)->count();
                 $jml_sakit = $absensiData->where('keterangan', 'Sakit')->count();
                 $jml_izin = $absensiData->where('keterangan', 'Izin')->count();
 
-                // Absen = hari kerja - (hadir + sakit + izin)
-                $jml_absen = max(0, $hariKerja - ($jml_hadir + $jml_sakit + $jml_izin));
+                $jml_terlambat = $absensiData->filter(fn($item) => str_contains($item->keterangan ?? '', 'Terlambat'))->count();
+                $jml_lembur = $absensiData->filter(fn($item) => str_contains($item->keterangan ?? '', 'Lembur'))->count();
 
-                // 3. Ambil data gaji & tunjangan
+                // --- LOGIKA PERHITUNGAN ABSEN YANG BARU ---
+                // Jumlah absen adalah hari kerja dikurangi hari hadir, sakit, dan semua hari izin.
+                $jml_absen = max(0, $hariKerja - ($jml_hadir_aktual + $jml_sakit + $jml_izin));
+                // --- AKHIR LOGIKA BARU ---
+
+                // 3. Ambil data user, jabatan, dan tunjangan terkait
                 $user = User::with('jabatan')->find($gaji->id_karyawan);
-                $gaji_pokok = $gaji->gaji_pokok;
-                $tunjangan_jabatan = $user->jabatan->tunjangan_jabatan ?? 0;
+                if (!$user || !$user->jabatan) {
+                    Log::warning("Karyawan dengan ID {$gaji->id_karyawan} tidak ditemukan atau tidak memiliki jabatan.");
+                    continue;
+                }
 
-                // 4. Kalkulasi pendapatan dan potongan
-                $pendapatan_lembur = $jml_lembur * self::RATE_LEMBUR;
-                $potongan_telat = $jml_terlambat * self::POTONGAN_TELAT;
-                $potongan_absen = $jml_absen * self::POTONGAN_ABSEN;
+                $tunjangan = Tunjangan::where('id_jabatan', $user->jabatan->id)->first();
+                $rate_lembur = $tunjangan->rate_lembur ?? 0;
 
-                // 5. Kalkulasi gaji bersih
-                $gaji_bersih = ($gaji_pokok + $tunjangan_jabatan + $pendapatan_lembur) - $potongan_telat - $potongan_absen;
-
-                // 6. Update record di tabel daftar_gaji
+                // 4. Update record di tabel daftar_gaji
                 $gaji->update([
-                    'periode_gaji' => $periodeString,
-                    'tanggal_hitung_gaji' => now('Asia/Jakarta')->toDateString(),
                     'jml_hr_kerja' => $hariKerja,
-                    'jml_hadir' => $jml_hadir,
+                    'jml_hadir' => $jml_hadir_aktual,
                     'jml_absen' => $jml_absen,
                     'jml_terlambat' => $jml_terlambat,
                     'jml_lembur' => $jml_lembur,
                     'jml_izin' => $jml_izin,
                     'jml_sakit' => $jml_sakit,
-                    'gaji_bersih' => $gaji_bersih,
                 ]);
 
-                Log::info("Gaji untuk karyawan ID: {$gaji->id_karyawan} pada periode {$periodeString} berhasil diupdate.");
+                Log::info("Data absensi untuk karyawan ID: {$gaji->id_karyawan} (Absen final: {$jml_absen}) berhasil diupdate.");
             }
 
-            $this->info('Kalkulasi gaji bulanan selesai dengan sukses!');
-            Log::info('Command kalkulasi gaji bulanan selesai.');
+            $this->info('Kalkulasi data absensi bulanan selesai dengan sukses!');
+            Log::info('Command kalkulasi data absensi bulanan selesai.');
 
         } catch (Exception $e) {
             Log::error('Error pada command kalkulasi gaji bulanan.', [

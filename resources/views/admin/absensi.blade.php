@@ -2,7 +2,6 @@
 
 @section('admin-master')
 
-{{-- Tambahkan meta tag ini untuk keamanan (Best Practice) --}}
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div class="page-heading">
@@ -22,9 +21,9 @@
                 <h1>User Absensi</h1>
             </div>
             <div class="card-body">
-                <!-- FORM UNTUK JAM MASUK / JAM KELUAR -->
-                <form action="{{ route('absensi.store') }}" method="POST">
+                <form action="{{ route('absensi.process') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="action_type" id="action_type" value="kehadiran">
                     <div class="mb-3">
                         <label for="id_karyawan" class="form-label">User</label>
                         <select name="id_karyawan" id="id_karyawan" class="form-select">
@@ -35,19 +34,29 @@
                     </div>
                     <div class="mb-3">
                         <label for="date" class="form-label">Tanggal</label>
-                        <input
-                            type="date"
-                            name="tanggal"
-                            id="date"
-                            class="form-control"
-                            value="{{ now()->toDateString() }}"
-                            required>
+                        <input type="date" name="tanggal" id="date" class="form-control" value="{{ now()->toDateString() }}" required>
                     </div>
-                    <!-- Tombol Kehadiran dihapus, diganti tombol proses dengan ID -->
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="other_status_checkbox">
+                        <label class="form-check-label" for="other_status_checkbox">Tandai Status Lain (Sakit/Izin)</label>
+                    </div>
+                    <div class="mb-3" id="other_status_container" style="display: none;">
+                        <label for="status" class="form-label">Pilih Status</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="Sakit">Sakit</option>
+                            <option value="Izin">Izin</option>
+                        </select>
+                    </div>
                     <button type="submit" id="submit-absensi-btn" class="btn btn-primary mt-3">Memeriksa Status...</button>
                 </form>
+            </div>
+        </div>
 
-                <h2 class="mt-5">Data Absensi</h2>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mt-2">Data Absensi</h2>
+            </div>
+            <div class="card-body">
                 <table class="table table-striped table-hover table-bordered">
                     <thead class="table-primary">
                         <tr>
@@ -65,11 +74,12 @@
                             <tr>
                                 <td>{{ $absen->user->nama }}</td>
                                 <td>{{ $absen->tanggal }}</td>
-                                <td>{{ $absen->jam_masuk }}</td>
-                                <td>{{ $absen->jam_keluar ?? 'Belum Absen Pulang' }}</td>
+                                <td>{{ $absen->jam_masuk ?? '-' }}</td>
+                                <td>{{ $absen->jam_keluar ?? '-' }}</td>
                                 <td>
-                                    {{-- Logika badge disesuaikan untuk boolean dan null --}}
-                                    @if(is_null($absen->kehadiran))
+                                    @if($absen->keterangan === 'Sakit' || $absen->keterangan === 'Izin')
+                                        <span class="badge bg-secondary">{{ $absen->keterangan }}</span>
+                                    @elseif(is_null($absen->kehadiran))
                                         <span class="badge bg-info">Sedang Bekerja</span>
                                     @else
                                         <span class="badge {{ $absen->kehadiran == 1 ? 'bg-success' : 'bg-danger' }}">
@@ -78,22 +88,17 @@
                                     @endif
                                 </td>
                                 <td>
-                                    {{-- Menampilkan status terlambat dan lembur --}}
-                                    @if($absen->keterangan)
-                                        @php $keterangan_parts = explode(', ', $absen->keterangan); @endphp
-                                        @foreach($keterangan_parts as $ket)
-                                            @if($ket === 'Terlambat')
-                                                <span class="badge bg-warning me-1">Terlambat</span>
-                                            @elseif($ket === 'Lembur')
-                                                <span class="badge bg-info me-1">Lembur</span>
-                                            @endif
-                                        @endforeach
-                                    @else
+                                    @if(Str::contains($absen->keterangan, 'Terlambat'))
+                                        <span class="badge bg-warning me-1">Terlambat</span>
+                                    @endif
+                                    @if(Str::contains($absen->keterangan, 'Lembur'))
+                                        <span class="badge bg-info me-1">Lembur</span>
+                                    @endif
+                                    @if(!Str::contains($absen->keterangan, ['Terlambat', 'Lembur', 'Sakit', 'Izin']))
                                         -
                                     @endif
                                 </td>
                                 <td>
-                                    <!-- Tombol Edit disesuaikan untuk data baru -->
                                     <button class="btn btn-sm btn-primary edit-btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modal-form-edit"
@@ -111,24 +116,13 @@
                 <div class="d-flex justify-content-center mt-4">
                     {{ $absensi->links('pagination::bootstrap-4') }}
                 </div>
-
             </div>
-
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
         </div>
     </section>
 </div>
 
-<!-- Modal Edit Disesuaikan -->
-<div class="modal fade text-left modal-borderless modal-md" id="modal-form-edit" tabindex="-1" role="dialog" aria-labelledby="modal-form-edit" aria-hidden="true">
+<!-- Modal Edit -->
+<div class="modal fade" id="modal-form-edit" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -145,11 +139,19 @@
                     </div>
                     <div class="form-group">
                         <label for="editJamMasuk" class="form-label">Jam Masuk</label>
-                        <input type="time" name="jam_masuk" class="form-control" id="editJamMasuk" step="1" required>
+                        <input type="time" name="jam_masuk" class="form-control" id="editJamMasuk" step="1">
                     </div>
                     <div class="form-group">
                         <label for="editJamKeluar" class="form-label">Jam Keluar</label>
                         <input type="time" name="jam_keluar" class="form-control" id="editJamKeluar" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_status" class="form-label">Ubah Status Menjadi (Opsional)</label>
+                        <select name="edit_status" id="edit_status" class="form-select">
+                            <option value="">-- Biarkan Hadir --</option>
+                            <option value="Sakit">Sakit</option>
+                            <option value="Izin">Izin</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="adminPassword" class="form-label">Admin Password</label>
@@ -165,18 +167,41 @@
     </div>
 </div>
 
-<!-- Script Disesuaikan -->
+{{-- Skrip dipindahkan ke sini untuk memastikan dieksekusi --}}
 <script>
+    // URL untuk AJAX check
     const statusCheckUrlTemplate = '{{ route("absensi.status", ["user" => "USER_ID", "tanggal" => "TANGGAL"]) }}';
 
+    // Fungsi ini akan dijalankan setelah seluruh halaman HTML dimuat
     document.addEventListener('DOMContentLoaded', function () {
-        const editButtons = document.querySelectorAll('.edit-btn');
+        // Definisi semua elemen form
         const userSelect = document.getElementById('id_karyawan');
         const dateInput = document.getElementById('date');
         const submitButton = document.getElementById('submit-absensi-btn');
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        async function updateButtonState() {
+        const otherStatusCheckbox = document.getElementById('other_status_checkbox');
+        const otherStatusContainer = document.getElementById('other_status_container');
+        const statusSelect = document.getElementById('status');
+        const actionTypeInput = document.getElementById('action_type');
+
+        const editButtons = document.querySelectorAll('.edit-btn');
+
+        // Fungsi utama untuk menentukan teks dan status tombol
+        function updateButtonUI() {
+            if (otherStatusCheckbox.checked) {
+                const selectedStatus = statusSelect.value;
+                submitButton.textContent = 'Simpan Status ' + selectedStatus;
+                submitButton.disabled = false;
+                actionTypeInput.value = 'status';
+            } else {
+                actionTypeInput.value = 'kehadiran';
+                updateDynamicButtonState();
+            }
+        }
+
+        // Fungsi untuk mengecek status ke server
+        async function updateDynamicButtonState() {
             const userId = userSelect.value;
             const tanggal = dateInput.value;
 
@@ -185,41 +210,39 @@
             submitButton.textContent = 'Memeriksa...';
             submitButton.disabled = true;
 
-            const finalUrl = statusCheckUrlTemplate
-                .replace('USER_ID', userId)
-                .replace('TANGGAL', tanggal);
+            const finalUrl = statusCheckUrlTemplate.replace('USER_ID', userId).replace('TANGGAL', tanggal);
 
             try {
                 const response = await fetch(finalUrl, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-
                 submitButton.textContent = data.text;
                 submitButton.disabled = data.disabled;
-
             } catch (error) {
-                console.error('Error fetching attendance status:', error);
+                console.error('Gagal fetch:', error);
                 submitButton.textContent = 'Gagal Memuat';
                 submitButton.disabled = true;
             }
         }
 
-        userSelect.addEventListener('change', updateButtonState);
-        dateInput.addEventListener('change', updateButtonState);
+        // --- Event Listeners ---
+        otherStatusCheckbox.addEventListener('change', function() {
+            otherStatusContainer.style.display = this.checked ? 'block' : 'none';
+            updateButtonUI();
+        });
 
-        updateButtonState();
+        statusSelect.addEventListener('change', updateButtonUI);
+        userSelect.addEventListener('change', updateButtonUI);
+        dateInput.addEventListener('change', updateButtonUI);
 
+        // Panggil fungsi utama saat halaman pertama kali dimuat
+        updateButtonUI();
+
+        // Event listener untuk tombol edit
         editButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const absensiId = this.dataset.id;
@@ -231,8 +254,10 @@
                 document.getElementById('editTanggal').value = tanggal;
                 document.getElementById('editJamMasuk').value = jamMasuk;
                 document.getElementById('editJamKeluar').value = jamKeluar;
+                document.getElementById('edit_status').value = "";
             });
         });
     });
 </script>
+
 @endsection

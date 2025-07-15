@@ -12,6 +12,8 @@ use App\Models\HakAkses;
 use App\Models\User;
 use App\Models\Jabatan;
 use App\Models\Jenis_Transaksi;
+use App\Models\Tunjangan;
+use App\Models\Potongan;
 use App\Models\Transaksi;
 use App\Models\Barang;
 use App\Models\Obat;
@@ -23,21 +25,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        //Seeder Potongan
+        Potongan::factory()
+            ->state(new Sequence(
+                [
+                    'potongan_absensi' => 50000,
+                    'potongan_terlambat' => 15000,
+                ]
+            ))
+            ->create();
         // Seeder HAK AKSES
         HakAkses::factory()
-            ->state(new Sequence(
-                ['hakakses' => 'admin']
+        ->state(new Sequence(
+            ['hakakses' => 'admin']
             ))
             ->create();
-        HakAkses::factory()
+            HakAkses::factory()
             ->state(new Sequence(
                 ['hakakses' => 'user']
-            ))
-            ->create();
-        HakAkses::factory()
+                ))
+                ->create();
+                HakAkses::factory()
             ->state(new Sequence(
                 ['hakakses' => 'Super Admin']
-            ))
+                ))
             ->create();
         // Seeder JABATAN
         Jabatan::factory()
@@ -49,7 +60,7 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
         Jabatan::factory()
-            ->state(new Sequence(
+        ->state(new Sequence(
                 [
                     'nama_jabatan' => 'Staff',
                     'gaji_pokok' => 1000000,
@@ -57,6 +68,25 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
 
+        //Seeder Tunjangan
+        Tunjangan::factory()
+            ->state(new Sequence(
+                [
+                    'id_jabatan' => 1,
+                    'tunjangan_jabatan' => 1250000,
+                    'rate_lembur' => 50000,
+                ]
+            ))
+            ->create();
+        Tunjangan::factory()
+            ->state(new Sequence(
+                [
+                    'id_jabatan' => 2,
+                    'tunjangan_jabatan' => 750000,
+                    'rate_lembur' => 30000,
+                ]
+            ))
+            ->create();
         // Seeder USER
         User::factory()
             ->state(new Sequence(

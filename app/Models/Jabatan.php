@@ -20,4 +20,8 @@ class Jabatan extends Model
     {
         return $this->hasMany(User::class, 'id_jabatan', 'id');
     }
+    public function jabatan()
+    {
+        return $this->belongsTo(Tunjangan::class, 'id_jabatan'); // Correct foreign key
+    }
 }

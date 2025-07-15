@@ -46,7 +46,6 @@
                             <th>Jumlah Sakit</th>
                             <th>Jumlah Terlambat</th>
                             <th>Jumlah Lembur</th>
-                            <th>Gaji Bersih</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -59,7 +58,6 @@
     </section>
 </div>
 
-<!-- Modal Tambah -->
 <div class="modal fade text-left modal-borderless" id="modal-form" tabindex="-1" role="dialog"
     aria-labelledby="modal-form" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
@@ -73,14 +71,13 @@
             <div class="modal-body">
                 <form action="{{ route('daftargaji.store') }}" method="POST">
                     @csrf
-                    <!-- Dropdown for Nama Karyawan -->
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
                             <select id="nama" name="id_karyawan" class="form-control" onchange="updateFields()">
                                 <option value="" disabled selected>Pilih Nama Karyawan</option>
                                 @foreach ($karyawans as $karyawan)
                                     <option value="{{ $karyawan->id }}" data-nama="{{ $karyawan->nama }} "
-                                        data-bagian="{{ $karyawan->hakAkses->hakakses }}">
+                                        data-jabatan="{{ $karyawan->jabatan->nama_jabatan }}">
                                         {{ $karyawan->nama }}
                                     </option>
                                 @endforeach
@@ -90,13 +87,11 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Hidden Input for Nama -->
                     <input type="hidden" id="hidden-nama" name="nama" value="">
 
-                    <!-- Auto-filled Bagian -->
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input id="bagian" name="bagian" type="text" placeholder="Bagian" class="form-control"
+                            <input id="jabatan" name="jabatan" type="text" placeholder="Jabatan" class="form-control"
                                 autocomplete="off" readonly />
                             <div class="form-control-icon">
                                 <i class="bi bi-card-list"></i>
@@ -104,22 +99,24 @@
                         </div>
                     </div>
 
-                    <!-- User Input Fields -->
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input id="gaji_perhari" name="gaji_perhari" type="number" placeholder="Gaji Perhari"
+                            <input id="gaji_pokok" name="gaji_pokok" type="number" placeholder="Gaji Pokok"
                                 class="form-control" autocomplete="off" />
                             <div class="form-control-icon">
-                                <i class="bi bi-plus-slash-minus"></i>
+                                <i class="bi bi-cash"></i>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Hidden Inputs for jumlah_hadir and absen -->
-                    <input type="hidden" name="jumlah_hadir" value="0">
-                    <input type="hidden" name="absen" value="0">
+                    <input type="hidden" name="jml_hr_kerja" value="0">
+                    <input type="hidden" name="jml_hadir" value="0">
+                    <input type="hidden" name="jml_absen" value="0">
+                    <input type="hidden" name="jml_izin" value="0">
+                    <input type="hidden" name="jml_sakit" value="0">
+                    <input type="hidden" name="jml_terlambat" value="0">
+                    <input type="hidden" name="jml_lembur" value="0">
                     <input type="hidden" name="gaji_bersih" value="0">
-                    <input type="hidden" name="bonus" value="0">
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
@@ -137,7 +134,6 @@
     </div>
 </div>
 
-<!-- Modal Delete-->
 <div class="modal fade text-left modal-borderless modal-md" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
@@ -160,42 +156,31 @@
     </div>
 </div>
 
-<!-- Modal Edit -->
 <div class="modal fade text-left modal-borderless modal-md" id="modal-form-edit" tabindex="-1" role="dialog" aria-labelledby="modal-form-edit" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <h3>Edit Gaji</h3>
-                    {{-- <p class="text-subtitle text-muted">
-                        Tambahkan keterangan setiap mengubah data, agar memudahkan pembukuan
-                    </p> --}}
                 </div>
             </div>
             <form method="POST" action="{{ route('daftargaji.update') }}">
                 @csrf
                 <div class="modal-body">
+                    <input type="hidden" id="id_karyawan" name="id_karyawan">
+
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="ID Karyawan" id="id_karyawan"
-                                name="id_karyawan" required autocomplete="off" readonly>
-                            <div class="form-control-icon">
-                                <i class="bi bi-file-earmark-binary"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Nama Karyawan" name="nama_karyawan" id="nama_karyawan" required
+                            <input type="text" class="form-control" placeholder="Nama Karyawan" name="nama" id="nama_karyawan" required
                                 autocomplete="default" readonly>
                             <div class="form-control-icon">
-                                <i class="bi bi-basket-fill"></i>
+                                <i class="bi bi-person-fill"></i>
                             </div>
                         </div>
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Jabatan" id="fjabatan" name="fjabatan" required
+                            <input type="text" class="form-control" placeholder="Jabatan" id="fjabatan" name="jabatan" required
                                 autocomplete="default" readonly>
                             <div class="form-control-icon">
                                 <i class="bi bi-card-list"></i>
@@ -204,17 +189,14 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Gaji Pokok" id="gaji_pokok" name="gaji_pokok" required
+                            <input type="number" class="form-control" placeholder="Gaji Pokok" id="gaji_pokok_edit" name="gaji_pokok" required
                                 autocomplete="default">
                             <div class="form-control-icon">
                                 <i class="bi bi-cash"></i>
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="jml_hadir" value="0">
-                    <input type="hidden" name="absen" value="0">
-                    <input type="hidden" name="gaji_bersih" value="0">
-                    <input type="hidden" name="bonus" value="0">
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
                         <i class="bx bx-x d-block d-sm-none"></i>
@@ -230,20 +212,15 @@
 </div>
 
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Mengubah format mata uang rupiah  -->
 <script>
     function formatRupiah(amount) {
     if (!amount) return 'Rp 0'; // Handle empty or null values
     return 'Rp ' + parseInt(amount, 10).toLocaleString('id-ID', { minimumFractionDigits: 0 });
     }
 </script>
-<!-- initialisasi DT -->
 <script>
        $(document).ready(function () {
         $('#gajiTable').DataTable({
@@ -254,7 +231,7 @@
                 { data: 'id_karyawan', name: 'id_karyawan' },
                 { data: 'nama', name: 'nama' },
                 { data: 'jabatan', name: 'jabatan' },
-                { data: 'gaji_pokok', name: 'gaji_pokok' },
+                { data: 'gaji_pokok', name: 'gaji_pokok', render: formatRupiah },
                 { data: 'jml_hr_kerja', name: 'jml_hr_kerja' },
                 { data: 'jml_hadir', name: 'jml_hadir' },
                 { data: 'jml_absen', name: 'jml_absen' },
@@ -262,18 +239,18 @@
                 { data: 'jml_sakit', name: 'jml_sakit' },
                 { data: 'jml_terlambat', name: 'jml_terlambat' },
                 { data: 'jml_lembur', name: 'jml_lembur' },
-                { data: 'gaji_bersih', name: 'gaji_bersih' },
                 {
                     data: null,
+                    orderable: false,
+                    searchable: false,
                     render: function (data, type, row) {
                         return `
                             <button class="btn btn-sm btn-primary edit-btn"
                                     data-bs-toggle="modal" data-bs-target="#modal-form-edit"
-                                    data-id="${row.id_karyawan}"
+                                    data-id-karyawan="${row.id_karyawan}"
                                     data-nama="${row.nama}"
                                     data-jabatan="${row.jabatan}"
-                                    data-gajipokok="${row.gaji_pokok}"
-                                    >
+                                    data-gaji-pokok="${row.gaji_pokok}">
                                 Edit
                             </button>
                             <button class="btn btn-sm btn-danger delete-btn"
@@ -285,14 +262,14 @@
                     },
                 },
             ],
-            pageLength: 10, // Set number of rows per page
-            lengthChange: false, // Optional: hide the page length dropdown
-            paging: true, // Ensure pagination is enabled
-            info: true, // Display info like "Showing X to Y of Z entries"
+            pageLength: 10,
+            lengthChange: false,
+            paging: true,
+            info: true,
         });
     });
 </script>
-{{-- Update Bagian --}}
+{{-- Update jabatan --}}
 <script>
     function updateFields() {
         const select = document.getElementById("nama");
@@ -302,48 +279,42 @@
         const nama = selectedOption.getAttribute("data-nama");
         document.getElementById("hidden-nama").value = nama;
 
-        // Update the 'bagian' field
-        const bagian = selectedOption.getAttribute("data-bagian");
-        document.getElementById("bagian").value = bagian;
+        // Update the 'jabatan' field which is named 'jabatan' in the form
+        const jabatan = selectedOption.getAttribute("data-jabatan");
+        document.getElementById("jabatan").value = jabatan;
     }
 
 </script>
 
-<!-- passing data dari btn ke modal  -->
 <script>
     $(document).on('click', '.edit-btn', function () {
-        // Retrieve data from the button
-        const id = $(this).data('id');
+        // Retrieve data from the button's data attributes
+        const idKaryawan = $(this).data('id-karyawan');
         const nama = $(this).data('nama');
         const jabatan = $(this).data('jabatan');
-        const bonus = $(this).data('bonus');
-        const gajipokok = $(this).data('gaji_pokok');
+        const gajiPokok = $(this).data('gaji-pokok');
+
         // Populate the modal form fields
-        $('#id_karyawan').val(id);
+        $('#id_karyawan').val(idKaryawan);
         $('#nama_karyawan').val(nama);
         $('#fjabatan').val(jabatan);
-        $('#fbonus').val(bonus);
-        $('#gaji_pokok').val(gajipokok);
+        $('#gaji_pokok_edit').val(gajiPokok);
 
         // Show the modal
         $('#modal-form-edit').modal('show');
     });
 </script>
-<!-- Delete Data -->
 <script>
      $('#gajiTable').on('click', '.delete-btn', function () {
         var id = $(this).data('id');
         var name = $(this).data('nama');
 
-        // Set the item name in the modal
-        $('#itemName').text(nama);
+        $('#itemName').text(name);
 
         // Set the form action to the correct delete URL
         $('#deleteForm').attr('action', '/admin/daftargaji/' + id);
 
-        console.log('Opening delete modal');
         $('#modal-delete').modal('show');
-
     });
 </script>
 @endsection

@@ -42,8 +42,6 @@ Route::group(['middleware' => 'guest'], function () {
 
 Route::get('logout', [AuthController::class, 'logout']);
 
-
-
 Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
     Route::prefix('admin')->group(function ()  {
         Route::controller(BarangController::class)->group(function () {
@@ -68,19 +66,20 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::post('/penjualan', 'store')->name('penjualan.store');
         });
         Route::controller(DaftarGajiController::class)->group(function () {
-            Route::get('/daftargaji', 'index')->name('daftargaji.index'); // Display the Daftar Gaji page
+            Route::get('/daftargaji', 'index')->name('daftargaji.index');
             Route::get('/daftargaji/data','data')->name('daftargaji.data');
-            Route::post('/tambahgaji', 'store')->name('daftargaji.store'); // Store a new entry
-            Route::post('/daftargaji/update', 'update')->name('daftargaji.update'); // Update an existing entry
-            Route::delete('/daftargaji/{id}', 'destroy')->name('daftargaji.destroy'); // Delete an entry
-            Route::get('/daftargaji/{id}', 'show')->name('daftargaji.show'); // Fetch data for a specific entry
+            Route::post('/daftargaji', 'store')->name('daftargaji.store');
+            Route::post('/daftargaji/update', 'update')->name('daftargaji.update');
+            Route::delete('/daftargaji/{id}', 'destroy')->name('daftargaji.destroy');
+            Route::get('/daftargaji/{id}', 'show')->name('daftargaji.show');
         });
         Route::controller(AbsensiController::class)->group(function () {
             Route::get('/absensi', 'index')->name('absensi.index');
-            Route::post('/absensi', 'store')->name('absensi.store');
+            Route::post('/absensi/process', 'process')->name('absensi.process');
             Route::put('/absensi/update','update')->name('absensi.update');
             Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');
             Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus');
+
 
         });
         Route::controller(PenggajianController::class)->group(function () {

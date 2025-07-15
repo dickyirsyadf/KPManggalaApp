@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('potongan', function (Blueprint $table) {
             $table->integer('potongan_absensi')->default(0);
             $table->integer('potongan_terlambat')->default(0);
-            $table->integer('total_potongan')->default(0);
             $table->timestamps();
         });
     }

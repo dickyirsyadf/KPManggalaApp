@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DaftarGaji;
+use App\Models\Jabatan;
 use App\Models\HakAkses;
 use App\Models\User;
 use Exception;
@@ -19,7 +20,7 @@ class DaftarGajiController extends Controller
      */
     public function index()
     {
-        $karyawans = User::with('hakakses')->get(); // Diperlukan untuk dropdown "Tambah"
+        $karyawans = User::with('hakakses','jabatan')->get(); // Diperlukan untuk dropdown "Tambah"
         $menu = 'Daftar Gaji';
         return view('admin.daftargaji', compact('karyawans', 'menu'));
     }
@@ -44,8 +45,8 @@ class DaftarGajiController extends Controller
         try {
             $request->validate([
                 'id_karyawan' => 'required|exists:users,id|unique:daftar_gaji,id_karyawan',
-                'nama' => 'required',
-                'jabatan' => 'required',
+                'nama' => 'required|string',
+                'jabatan' => 'required|string',
                 'gaji_pokok' => 'required|integer|min:0',
             ]);
 
@@ -54,7 +55,6 @@ class DaftarGajiController extends Controller
                 'id_karyawan' => $request->id_karyawan,
                 'nama' => $request->nama,
                 'jabatan' => $request->jabatan,
-                'tanggal_hitung_gaji' => now()->toDateString(),
                 'gaji_pokok' => $request->gaji_pokok,
                 'jml_hr_kerja' => 0, // Akan diisi oleh command
                 'jml_hadir' => 0,
@@ -63,7 +63,6 @@ class DaftarGajiController extends Controller
                 'jml_sakit' => 0,
                 'jml_terlambat' => 0,
                 'jml_lembur' => 0,
-                'gaji_bersih' => $request->gaji_pokok, // Gaji bersih awal = gaji pokok
             ]);
             return back()->with('success', 'Tambah Gaji Berhasil');
         } catch (Exception $e) {
@@ -79,11 +78,12 @@ class DaftarGajiController extends Controller
     {
         try {
             $request->validate([
-                'id' => 'required|exists:daftar_gaji,id', // Validasi berdasarkan ID record
+                'id_karyawan' => 'required|exists:daftar_gaji,id_karyawan', // Validasi berdasarkan id_karyawan
                 'gaji_pokok' => 'required|integer|min:0',
             ]);
 
-            $gaji = DaftarGaji::findOrFail($request->id);
+            // Cari record berdasarkan id_karyawan, bukan primary key 'id'
+            $gaji = DaftarGaji::where('id_karyawan', $request->id_karyawan)->firstOrFail();
 
             // Update hanya gaji pokok, dan hitung ulang gaji bersih secara sederhana
             $gaji->update([
@@ -103,12 +103,13 @@ class DaftarGajiController extends Controller
 
     /**
      * Menghapus data gaji.
+     * @param string $id Ini adalah id_karyawan dari route
      */
     public function destroy($id)
     {
         try {
-            // Menemukan record berdasarkan ID uniknya dan menghapusnya
-            $gaji = DaftarGaji::findOrFail($id);
+            // Menemukan record berdasarkan id_karyawan dan menghapusnya
+            $gaji = DaftarGaji::where('id_karyawan', $id)->firstOrFail();
             $gaji->delete();
 
             return back()->with('success', 'Hapus Daftar Gaji Berhasil!');
