@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->string('id', 5)->primary();
             $table->string('nama', 50)->nullable(false);
+            $table->foreignID('id_jabatan')->unsigned()->default(2);
             $table->string('email')->nullable(true);
             $table->string('no_hp', 14)->nullable(true);
             $table->foreignId('id_hakakses')->unsigned()->default(2);
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_hakakses')->references('id')->on('hakakses');
+            $table->foreign('id_jabatan')->references('id')->on('jabatan');
         });
     }
 

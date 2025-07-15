@@ -10,7 +10,10 @@ class DaftarGaji extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_karyawan', 'nama', 'bagian', 'jumlah_hadir', 'gaji_perhari', 'absen', 'bonus', 'gaji_bersih'
+        'id_karyawan', 'nama', 'jabatan',
+        'gaji_pokok', 'jml_hr_kerja', 'jml_hadir',
+        'jml_absen', 'jml_izin','jml_sakit', 'jml_terlambat',
+        'jml_lembur', 'gaji_bersih', 'created_at', 'updated_at'
     ];
 
     protected $table = 'daftar_gaji';

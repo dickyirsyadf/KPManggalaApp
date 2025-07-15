@@ -15,152 +15,106 @@ use Illuminate\Support\Facades\DB;
 class DaftarGajiController extends Controller
 {
     /**
-     * Display the daftar gaji view.
+     * Menampilkan halaman daftar gaji.
      */
     public function index()
     {
-        $karyawans = User::with('hakakses')->get(); // Load users with their related hakakses
-        $hakakses = HakAkses::all(); // Fetch all hakakses
-        $menu = 'Daftar Gaji'; // Define menu
-
-        // Pass all variables to the view
-        return view('admin.daftargaji', compact('karyawans', 'hakakses', 'menu'));
+        $karyawans = User::with('hakakses')->get(); // Diperlukan untuk dropdown "Tambah"
+        $menu = 'Daftar Gaji';
+        return view('admin.daftargaji', compact('karyawans', 'menu'));
     }
 
 
     /**
-     * Fetch data for DataTable.
+     * Menyediakan data untuk DataTables.
      */
     public function data()
-{
-    $data = DB::table('daftar_gaji')
-        ->join('users as karyawan', 'daftar_gaji.id_karyawan', '=', 'karyawan.id')
-        ->join('hakakses', 'karyawan.id_hakakses', '=', 'hakakses.id') // Join the hakakses table
-        ->select(
-            'daftar_gaji.*',
-            'karyawan.nama',
-            'hakakses.hakakses' // Use bagian from hakakses
-        )
-        ->get();
-
-    // Return the data in the DataTables format
-    return DataTables::of($data)->toJson();
-}
+    {
+        // Menggunakan Eloquent untuk query yang lebih bersih
+        $data = DaftarGaji::query();
+        return DataTables::of($data)->toJson();
+    }
 
 
     /**
-     * Store a new gaji record.
+     * Menyimpan data gaji awal.
      */
     public function store(Request $request)
     {
-        try{
+        try {
             $request->validate([
-                'id_karyawan' => 'required|exists:users,id',
-                'nama'=>'required',
-                'jumlah_hadir' => 'nullable|integer|min:0',
-                'gaji_perhari' => 'required|integer|min:0',
-                'absen' => 'nullable|integer|min:0',
-                'bonus' => 'required|integer|min:0',
-                'gaji_bersih' => 'required|integer|min:0',
+                'id_karyawan' => 'required|exists:users,id|unique:daftar_gaji,id_karyawan',
+                'nama' => 'required',
+                'jabatan' => 'required',
+                'gaji_pokok' => 'required|integer|min:0',
             ]);
 
-            $user = User::with('hakAkses')->findOrFail($request->id_karyawan);
-            $bagian = $user->hakAkses->hakakses;
-
+            // Membuat record gaji awal. Kolom lain akan diisi oleh command.
             DaftarGaji::create([
                 'id_karyawan' => $request->id_karyawan,
-                'nama'=> $request->nama,
-                'bagian' => $bagian,
-                'jumlah_hadir' => $request->jumlah_hadir ?? null,
-                'gaji_perhari' => $request->gaji_perhari,
-                'absen' => $request->absen ?? null,
-                'bonus' => $request->bonus,
-                'gaji_bersih' => $request->gaji_bersih,
+                'nama' => $request->nama,
+                'jabatan' => $request->jabatan,
+                'tanggal_hitung_gaji' => now()->toDateString(),
+                'gaji_pokok' => $request->gaji_pokok,
+                'jml_hr_kerja' => 0, // Akan diisi oleh command
+                'jml_hadir' => 0,
+                'jml_absen' => 0,
+                'jml_izin' => 0,
+                'jml_sakit' => 0,
+                'jml_terlambat' => 0,
+                'jml_lembur' => 0,
+                'gaji_bersih' => $request->gaji_pokok, // Gaji bersih awal = gaji pokok
             ]);
             return back()->with('success', 'Tambah Gaji Berhasil');
-        }catch(Exception $e){
-            return back()->with('error' . $e->getMessage() , 'Tambah barang Gagal! Isi Form Dengan Benar');
+        } catch (Exception $e) {
+            Log::error('Error storing Gaji: ' . $e->getMessage());
+            return back()->with('error', 'Tambah Gaji Gagal! Pastikan karyawan belum ada di daftar.');
         }
-
-    }
-
-
-    /**
-     * Fetch details for a specific gaji record.
-     */
-    public function getGaji($id)
-    {
-        $gaji = DaftarGaji::with('user')->findOrFail($id);
-        return response()->json($gaji);
     }
 
     /**
-     * Update an existing gaji record.
+     * Update data gaji yang sudah ada.
      */
     public function update(Request $request)
     {
         try {
-            // Log the request payload for debugging
-            Log::info('Update request received', ['payload' => $request->all()]);
-
-            // Validate the request
             $request->validate([
-                'id_karyawan' => 'required|exists:users,id',
-                'gaji_perhari' => 'required|integer|min:0',
+                'id' => 'required|exists:daftar_gaji,id', // Validasi berdasarkan ID record
+                'gaji_pokok' => 'required|integer|min:0',
             ]);
 
-            // Fetch the DaftarGaji record
-            $gaji = DaftarGaji::where('id_karyawan', $request->id_karyawan)->first();
+            $gaji = DaftarGaji::findOrFail($request->id);
 
-            // Log if the record is not found
-            if (!$gaji) {
-                Log::warning('DaftarGaji record not found', ['id_karyawan' => $request->id_karyawan]);
-                return response()->json(['message' => 'Record not found'], 404);
-            }
-
-            // Log the record before updating
-            Log::info('DaftarGaji record before update', ['record' => $gaji]);
-
-            // Perform the update
+            // Update hanya gaji pokok, dan hitung ulang gaji bersih secara sederhana
             $gaji->update([
-                'gaji_perhari' => $request->gaji_perhari,
-                'gaji_bersih' => 0,
+                'gaji_pokok' => $request->gaji_pokok,
+                // Gaji bersih akan dihitung ulang oleh command,
+                // tapi kita bisa update di sini untuk konsistensi sementara.
+                'gaji_bersih' => $request->gaji_pokok,
             ]);
-
-            // Log the updated record
-            Log::info('DaftarGaji record updated successfully', ['updated_record' => $gaji->fresh()]);
 
             return back()->with('success', 'Edit Gaji Berhasil');
-        } catch (\Exception $e) {
-            // Log the exception
-            Log::error('Error updating DaftarGaji record', [
-                'error_message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return back()->with('Gagal', 'Edit Gaji Gagal');
+        } catch (Exception $e) {
+            Log::error('Error updating Gaji: ' . $e->getMessage());
+            return back()->with('error', 'Edit Gaji Gagal!');
         }
     }
 
 
-
-
     /**
-     * Delete a gaji record.
+     * Menghapus data gaji.
      */
     public function destroy($id)
     {
         try {
-            $gaji = DaftarGaji::where('id_karyawan', $id)->firstOrFail();
+            // Menemukan record berdasarkan ID uniknya dan menghapusnya
+            $gaji = DaftarGaji::findOrFail($id);
             $gaji->delete();
 
             return back()->with('success', 'Hapus Daftar Gaji Berhasil!');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return back()->with('error', 'Data tidak ditemukan!');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error deleting Daftar Gaji: " . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat menghapus data!');
+            return back()->with('error', 'Gagal menghapus data!');
         }
     }
-
 }

@@ -18,6 +18,7 @@
                 <h1>User Absensi</h1>
             </div>
             <div class="card-body">
+                <!-- FORM UNTUK JAM MASUK / JAM KELUAR -->
                 <form action="{{ route('absensi.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
@@ -29,50 +30,56 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="date" class="form-label">Date</label>
+                        <label for="date" class="form-label">Tanggal</label>
                         <input
                             type="date"
-                            name="date"
+                            name="tanggal"
                             id="date"
                             class="form-control"
                             value="{{ now()->toDateString() }}"
                             required>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="kehadiran" id="kehadiran" checked>
-                        <label class="form-check-label" for="kehadiran">Hadir</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Simpan</button>
+                    <!-- Tombol Kehadiran dihapus, diganti tombol proses -->
+                    <button type="submit" class="btn btn-primary mt-3">Proses Absensi (Masuk/Pulang)</button>
                 </form>
 
-                <h2 class="mt-5">Absensi Records</h2>
+                <h2 class="mt-5">Data Absensi</h2>
                 <table class="table table-striped table-hover table-bordered">
                     <thead class="table-primary">
                         <tr>
                             <th>Karyawan</th>
                             <th>Tanggal</th>
-                            <th>Kehadiran</th>
+                            <th>Jam Masuk</th>
+                            <th>Jam Keluar</th>
+                            <th>Status Kehadiran</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($absensi as $absensis)
+                        @foreach($absensi as $absen)
                             <tr>
-                                <td>{{ $absensis->user->nama }}</td>
-                                <td>{{ $absensis->tanggal }}</td>
+                                <td>{{ $absen->user->nama }}</td>
+                                <td>{{ $absen->tanggal }}</td>
+                                <td>{{ $absen->jam_masuk }}</td>
+                                <td>{{ $absen->jam_keluar ?? 'Belum Absen Pulang' }}</td>
                                 <td>
-                                    <span class="badge {{ $absensis->kehadiran == 1 ? 'bg-success' : 'bg-danger' }}">
-                                        {{ $absensis->kehadiran == 1 ? 'Hadir' : 'Tidak Hadir' }}
-                                    </span>
+                                    @if($absen->jam_keluar)
+                                        <span class="badge {{ $absen->kehadiran == 'hadir' ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $absen->kehadiran == 'hadir' ? 'Hadir' : 'Tidak Hadir' }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-info">Sedang Bekerja</span>
+                                    @endif
                                 </td>
                                 <td>
-                                    <!-- Edit button -->
+                                    <!-- Tombol Edit disesuaikan untuk data baru -->
                                     <button class="btn btn-sm btn-primary edit-btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modal-form-edit"
-                                        data-id="{{ $absensis->id }}"
-                                        data-tanggal="{{ $absensis->tanggal }}"
-                                        data-kehadiran="{{ $absensis->kehadiran }}">
+                                        data-id="{{ $absen->id }}"
+                                        data-tanggal="{{ $absen->tanggal }}"
+                                        data-jam-masuk="{{ $absen->jam_masuk }}"
+                                        data-jam-keluar="{{ $absen->jam_keluar }}">
                                         Edit
                                     </button>
                                 </td>
@@ -99,36 +106,29 @@
     </section>
 </div>
 
-<!-- Modal Edit -->
+<!-- Modal Edit Disesuaikan -->
 <div class="modal fade text-left modal-borderless modal-md" id="modal-form-edit" tabindex="-1" role="dialog" aria-labelledby="modal-form-edit" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">
-                    <h3>Edit Absen</h3>
-                    <p class="text-subtitle text-muted">
-                        Enter admin password to authorize the edit.
-                    </p>
-                </div>
+                <h3 class="modal-title">Edit Absensi</h3>
             </div>
             <form method="POST" action="{{ route('absensi.update') }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="absensiId">Absensi ID</label>
-                        <input type="hidden" name="id" id="absensiId" required>
-                    </div>
+                    <input type="hidden" name="id" id="absensiId" required>
                     <div class="form-group">
                         <label for="editTanggal" class="form-label">Tanggal</label>
                         <input type="date" name="tanggal" class="form-control" id="editTanggal" required>
                     </div>
                     <div class="form-group">
-                        <label for="editKehadiran" class="form-label">Kehadiran</label>
-                        <select name="kehadiran" class="form-select" id="editKehadiran" required>
-                            <option value="1">Hadir</option>
-                            <option value="0">Tidak Hadir</option>
-                        </select>
+                        <label for="editJamMasuk" class="form-label">Jam Masuk</label>
+                        <input type="time" name="jam_masuk" class="form-control" id="editJamMasuk" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editJamKeluar" class="form-label">Jam Keluar</label>
+                        <input type="time" name="jam_keluar" class="form-control" id="editJamKeluar" step="1">
                     </div>
                     <div class="form-group">
                         <label for="adminPassword" class="form-label">Admin Password</label>
@@ -143,19 +143,25 @@
         </div>
     </div>
 </div>
+
+<!-- Script Disesuaikan -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const editButtons = document.querySelectorAll('.edit-btn');
 
         editButtons.forEach(button => {
             button.addEventListener('click', function () {
+                // Mengambil semua data dari atribut data-*
                 const absensiId = this.dataset.id;
                 const tanggal = this.dataset.tanggal;
-                const kehadiran = this.dataset.kehadiran;
+                const jamMasuk = this.dataset.jamMasuk;
+                const jamKeluar = this.dataset.jamKeluar;
 
+                // Mengisi nilai ke dalam form modal
                 document.getElementById('absensiId').value = absensiId;
                 document.getElementById('editTanggal').value = tanggal;
-                document.getElementById('editKehadiran').value = kehadiran;
+                document.getElementById('editJamMasuk').value = jamMasuk;
+                document.getElementById('editJamKeluar').value = jamKeluar;
             });
         });
     });

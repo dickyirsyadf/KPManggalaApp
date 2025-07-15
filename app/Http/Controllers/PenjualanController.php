@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obat;
+use App\Models\Barang;
 use App\Models\DetailPenjualan;
 use App\Models\Penjualan;
 use App\Models\Transaksi;
@@ -79,7 +79,7 @@ class PenjualanController extends Controller
             $totalNominalTransaksi = 0;
             foreach ($validated['detail_penjualan'] as $item) {
                 // Look up the product in the database using its name
-                $barang = Obat::where('nama', $item['product'])->first();
+                $barang = Barang::where('nama', $item['product'])->first();
 
                 if (!$barang || $barang->stock < $item['qty']) {
                     // If stock is not sufficient, return error response
@@ -91,7 +91,7 @@ class PenjualanController extends Controller
                 // Insert each item into the detail_penjualan table
                 DetailPenjualan::create([
                     'id_penjualan' => $transactionId, // Associate with the correct transaction ID
-                    'id_obat' => $barang->id,
+                    'id_barang' => $barang->id,
                     'qty' => $item['qty'],
                     'harga' => $barang->harga_jual,
                     'subtotal' => $item['subtotal'],

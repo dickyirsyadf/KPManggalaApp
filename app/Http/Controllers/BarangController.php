@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obat;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -13,17 +13,17 @@ use Carbon\CarbonTimeZone;
 use Yajra\DataTables\Facades\DataTables;
 use Exception;
 
-class ObatController extends Controller
+class BarangController extends Controller
 {
     function index(){
         $data = [
-            'menu' => 'Obat',
+            'menu' => 'Barang',
         ];
-        return view('admin.obat', $data);
+        return view('admin.barang', $data);
     }
-    function obat(){
-        $obat = Obat::all();
-        return DataTables::of($obat)
+    function Barang(){
+        $Barang = Barang::all();
+        return DataTables::of($Barang)
             ->addColumn('harga', function ($row) {
                 return $row->harga;
             })
@@ -34,7 +34,7 @@ class ObatController extends Controller
             $timeZone = new CarbonTimeZone('Asia/Jakarta');
             $dateNow = Carbon::now($timeZone);
 
-            Obat::create([
+            Barang::create([
                 'nama' => $request['nama'],
                 'deskripsi' => $request['deskripsi'],
                 'stock' => $request['stock'],
@@ -48,16 +48,16 @@ class ObatController extends Controller
             ]);
 
             return back()->with('error', 'Terjadi kesalahan! Periksa log untuk detail.');
-            // return back()->with('error' . $e->getMessage() , 'Tambah Obat Gagal! Isi Form Dengan Benar');
+            // return back()->with('error' . $e->getMessage() , 'Tambah Barang Gagal! Isi Form Dengan Benar');
         }
-        return back()->with('success', 'Tambah Obat Berhasil');
+        return back()->with('success', 'Tambah Barang Berhasil');
     }
     function update(Request $request)
     {
         try {
             // Validate the incoming request
             $request->validate([
-                'id_barang' => 'required|exists:obat,id',
+                'id_barang' => 'required|exists:Barang,id',
                 'nama_barang' => 'required|string|max:255',
                 'fdeskripsi' => 'required|string|max:255',
                 'fhargaj' => 'required|numeric',
@@ -66,17 +66,17 @@ class ObatController extends Controller
             ]);
 
             // Find the record by ID
-            $obat = Obat::findOrFail($request->id_barang);
+            $Barang = Barang::findOrFail($request->id_barang);
 
             // Update the record
-            $obat->nama = $request->nama_barang;
-            $obat->deskripsi = $request->fdeskripsi;
-            $obat->harga_jual = $request->fhargaj;
-            $obat->harga_modal = $request->fhargam;
-            $obat->stock = $request->fstock;
-            $obat->save();
+            $Barang->nama = $request->nama_barang;
+            $Barang->deskripsi = $request->fdeskripsi;
+            $Barang->harga_jual = $request->fhargaj;
+            $Barang->harga_modal = $request->fhargam;
+            $Barang->stock = $request->fstock;
+            $Barang->save();
 
-            return back()->with('success', 'Edit Obat Berhasil !');
+            return back()->with('success', 'Edit Barang Berhasil !');
 
         } catch (Exception $e) {
             Log::error('\Error in store method:', [
@@ -85,20 +85,20 @@ class ObatController extends Controller
             ]);
 
             return back()->with('error', 'Terjadi kesalahan! Periksa log untuk detail.');
-            // return back()->with('error', 'Edit Obat Gagal! Isi Form Dengan Benar');
+            // return back()->with('error', 'Edit Barang Gagal! Isi Form Dengan Benar');
         }
     }
     function delete($id)
     {
         try{
-            $obat = Obat::findOrFail($id);
+            $Barang = Barang::findOrFail($id);
             // Delete the item
-            $obat->delete();
+            $Barang->delete();
 
             // Return a success response
-            return back()->with('success', 'Hapus Obat Berhasil !');
+            return back()->with('success', 'Hapus Barang Berhasil !');
         }catch(Exception $e){
-            return back()->with('error', 'Hapus Obat Gagal! Data Tidak Ditemukan');
+            return back()->with('error', 'Hapus Barang Gagal! Data Tidak Ditemukan');
         }
 
     }

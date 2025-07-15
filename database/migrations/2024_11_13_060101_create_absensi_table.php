@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('id_karyawan');
             $table->date("tanggal");
-            $table->boolean('kehadiran')->default(true);
+            $table->time('jam_masuk')->nullable();
+            $table->time('jam_keluar')->nullable();
+            $table->boolean('kehadiran')->default(false);
             $table->timestamps();
 
             $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');

@@ -129,7 +129,7 @@
      $('#barangTable').DataTable({
          processing: true,
          serverSide: true,
-         ajax: "{{ route('obat.data') }}",
+         ajax: "{{ route('barang.data') }}",
          columns: [
              { data: 'nama', name: 'nama', searchable: true },
              { data: 'stock', name: 'stock' },

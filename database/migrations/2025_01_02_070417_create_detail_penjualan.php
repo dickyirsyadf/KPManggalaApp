@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('detail_penjualan', function (Blueprint $table) {
             $table->id();
             $table->string('id_penjualan'); // Foreign key for sale transaction
-            $table->unsignedBigInteger('id_obat'); // Foreign key for product
+            $table->unsignedBigInteger('id_barang'); // Foreign key for product
             $table->integer('qty'); // Quantity sold
             $table->decimal('harga', 15, 2); // Price per unit
             $table->decimal('subtotal', 15, 2); // Total for this item
@@ -23,7 +23,7 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('id_penjualan')->references('id')->on('penjualan')->onDelete('cascade');
-            $table->foreign('id_obat')->references('id')->on('obat')->onDelete('cascade');
+            $table->foreign('id_barang')->references('id')->on('barang')->onDelete('cascade');
 
         });
     }

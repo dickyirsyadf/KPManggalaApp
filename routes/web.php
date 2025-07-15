@@ -4,11 +4,11 @@ use App\Http\Controllers\AbsensiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DaftarGajiController;
 use App\Http\Controllers\DashboardController;
 use App\http\Controllers\KaryawanController;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\ObatController;
 use App\Http\Controllers\PenggajianController;
 use App\Http\Controllers\PenjualanController;
 use FontLib\Table\Type\name;
@@ -46,12 +46,12 @@ Route::get('logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
     Route::prefix('admin')->group(function ()  {
-        Route::controller(ObatController::class)->group(function () {
-            Route::get('obat','index')->name('obat.index');
-            Route::get('obat/data','obat')->name('obat.data');
-            Route::post('/tambahobat', 'create')->name('obat.store');
-            Route::post('/obat/edit', 'update')->name('obat.update');
-            Route::delete('/obat/{id}','delete')->name('obat.delete');
+        Route::controller(BarangController::class)->group(function () {
+            Route::get('barang','index')->name('barang.index');
+            Route::get('barang/data','barang')->name('barang.data');
+            Route::post('/tambahbarang', 'create')->name('barang.store');
+            Route::post('/barang/edit', 'update')->name('barang.update');
+            Route::delete('/barang/{id}','delete')->name('barang.delete');
 
         });
         Route::controller(KaryawanController::class)->group(function () {
@@ -79,6 +79,8 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('/absensi', 'index')->name('absensi.index');
             Route::post('/absensi', 'store')->name('absensi.store');
             Route::put('/absensi/update','update')->name('absensi.update');
+            Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');
+            Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus');
 
         });
         Route::controller(PenggajianController::class)->group(function () {

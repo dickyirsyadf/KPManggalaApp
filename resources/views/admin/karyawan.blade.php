@@ -28,9 +28,10 @@
                         <tr>
                             <th>#</th>
                             <th>Nama Karyawan</th>
+                            <th>Jabatan</th>
                             <th>Email</th>
                             <th>No Handphone</th>
-                            <th>hakakses</th>
+                            <th>Hakakses</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -90,6 +91,19 @@
                                 <option value="">Select Hak Akses</option>
                                 @foreach($hakakses as $hak)
                                     <option value="{{ $hak->id }}">{{ $hak->hakakses }}</option>
+                                @endforeach
+                            </select>
+                            <div class="form-control-icon">
+                                <i class="bi bi-phone"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group has-icon-left">
+                        <div class="position-relative">
+                            <select class="form-control" id="hakakses" name="id_hakakses" required>
+                                <option value="">Select Jabatan</option>
+                                @foreach($jabatan as $jbt)
+                                    <option value="{{ $jbt->id }}">{{ $jbt->jabatan }}</option>
                                 @endforeach
                             </select>
                             <div class="form-control-icon">
@@ -177,6 +191,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group has-icon-left">
+                        <div class="position-relative">
+                            <select class="form-control" id="fhakakses" name="fhakakses" required>
+                                <option value="">Select Hak Akses</option>
+                                @foreach($jabatan as $jbt)
+                                    <option value="{{ $jbt->id }}">{{ $jbt->jabatan }}</option>
+                                @endforeach
+                            </select>
+                            <div class="form-control-icon">
+                                <i class="bi bi-chat-right-text"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
@@ -231,6 +258,7 @@
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'nama', name: 'nama', searchable: true },
+                { data: 'jabatan', name: 'jabatan', searchable: true, orderable: true },
                 { data: 'email', name: 'email',searchable: true },
                 { data: 'no_hp', name: 'no_hp' },
                 { data: 'hakakses', name: 'hakakses', searchable: true, orderable: true },
@@ -271,6 +299,7 @@
         const nama = $(this).data('nama');
         const email = $(this).data('email');
         const hakaksesId = $(this).data('hakakses');
+        const jabatanId = $(this).data('jabatan');
         const no_hp = $(this).data('no_hp');
         // Populate the modal form fields
         $('#id_karyawan').val(id);
@@ -292,6 +321,22 @@
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching HakAkses data: " + error);
+            }
+        });
+        $.ajax({
+            url: '/admin/karyawan/get-jabatan/' + jabatanId,
+            type: 'GET',
+            success: function (response) {
+                if (response.hakakses) {
+                    // Set the hakakses dropdown to the correct value (ID of HakAkses)
+                    $('#fhakakses').val(jabatanId); // Pre-select the hakakses dropdown option
+                } else {
+                    // Optionally handle the case where hakakses data is not found
+                    console.error('Jabatan data not found');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching Jabatan data: " + error);
             }
         });
 

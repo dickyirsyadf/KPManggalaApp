@@ -37,11 +37,15 @@
                         <tr>
                             <th>ID Karyawan</th>
                             <th>Nama</th>
-                            <th>Bagian</th>
+                            <th>Jabatan</th>
+                            <th>Gaji Pokok</th>
+                            <th>Jumlah Hari Kerja</th>
                             <th>Jumlah Hadir</th>
-                            <th>Gaji Per Hari</th>
-                            <th>Absen</th>
-                            <th>Bonus</th>
+                            <th>Jumlah Absen</th>
+                            <th>Jumlah Izin</th>
+                            <th>Jumlah Sakit</th>
+                            <th>Jumlah Terlambat</th>
+                            <th>Jumlah Lembur</th>
                             <th>Gaji Bersih</th>
                             <th>Actions</th>
                         </tr>
@@ -191,7 +195,7 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="bagian" id="fbagian" name="fbagian" required
+                            <input type="text" class="form-control" placeholder="Jabatan" id="fjabatan" name="fjabatan" required
                                 autocomplete="default" readonly>
                             <div class="form-control-icon">
                                 <i class="bi bi-card-list"></i>
@@ -200,14 +204,14 @@
                     </div>
                     <div class="form-group has-icon-left">
                         <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Gaji Perhari" id="gaji_perhari" name="gaji_perhari" required
+                            <input type="text" class="form-control" placeholder="Gaji Pokok" id="gaji_pokok" name="gaji_pokok" required
                                 autocomplete="default">
                             <div class="form-control-icon">
                                 <i class="bi bi-cash"></i>
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="jumlah_hadir" value="0">
+                    <input type="hidden" name="jml_hadir" value="0">
                     <input type="hidden" name="absen" value="0">
                     <input type="hidden" name="gaji_bersih" value="0">
                     <input type="hidden" name="bonus" value="0">
@@ -249,11 +253,15 @@
             columns: [
                 { data: 'id_karyawan', name: 'id_karyawan' },
                 { data: 'nama', name: 'nama' },
-                { data: 'bagian', name: 'bagian' },
-                { data: 'jumlah_hadir', name: 'jumlah_hadir' },
-                { data: 'gaji_perhari', name: 'gaji_perhari' },
-                { data: 'absen', name: 'absen' },
-                { data: 'bonus', name: 'bonus' },
+                { data: 'jabatan', name: 'jabatan' },
+                { data: 'gaji_pokok', name: 'gaji_pokok' },
+                { data: 'jml_hr_kerja', name: 'jml_hr_kerja' },
+                { data: 'jml_hadir', name: 'jml_hadir' },
+                { data: 'jml_absen', name: 'jml_absen' },
+                { data: 'jml_izin', name: 'jml_izin' },
+                { data: 'jml_sakit', name: 'jml_sakit' },
+                { data: 'jml_terlambat', name: 'jml_terlambat' },
+                { data: 'jml_lembur', name: 'jml_lembur' },
                 { data: 'gaji_bersih', name: 'gaji_bersih' },
                 {
                     data: null,
@@ -263,9 +271,9 @@
                                     data-bs-toggle="modal" data-bs-target="#modal-form-edit"
                                     data-id="${row.id_karyawan}"
                                     data-nama="${row.nama}"
-                                    data-bagian="${row.bagian}"
-                                    data-gajiharian="${row.gaji_perhari}"
-                                    data-bonus="${row.bonus}">
+                                    data-jabatan="${row.jabatan}"
+                                    data-gajipokok="${row.gaji_pokok}"
+                                    >
                                 Edit
                             </button>
                             <button class="btn btn-sm btn-danger delete-btn"
@@ -307,15 +315,15 @@
         // Retrieve data from the button
         const id = $(this).data('id');
         const nama = $(this).data('nama');
-        const bagian = $(this).data('bagian');
+        const jabatan = $(this).data('jabatan');
         const bonus = $(this).data('bonus');
-        const gajiharian = $(this).data('gajiharian');
+        const gajipokok = $(this).data('gaji_pokok');
         // Populate the modal form fields
         $('#id_karyawan').val(id);
         $('#nama_karyawan').val(nama);
-        $('#fbagian').val(bagian);
+        $('#fjabatan').val(jabatan);
         $('#fbonus').val(bonus);
-        $('#gaji_perhari').val(gajiharian);
+        $('#gaji_pokok').val(gajipokok);
 
         // Show the modal
         $('#modal-form-edit').modal('show');

@@ -26,6 +26,7 @@ class User extends Authenticatable
     protected $fillable = [
         'id',
         'nama',
+        'id_jabatan', // Assuming this is the foreign key for Jabatan
         'email',
         'no_hp',
         'no_hp_verified_at',
@@ -43,6 +44,10 @@ class User extends Authenticatable
     public function hakakses()
     {
         return $this->belongsTo(HakAkses::class, 'id_hakakses'); // Correct foreign key
+    }
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, 'id_jabatan'); // Correct foreign key
     }
     public function absensi()
     {

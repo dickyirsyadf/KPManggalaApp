@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Sequence;
 
 use App\Models\HakAkses;
 use App\Models\User;
+use App\Models\Jabatan;
 use App\Models\Jenis_Transaksi;
 use App\Models\Transaksi;
 use App\Models\Barang;
@@ -38,11 +39,23 @@ class DatabaseSeeder extends Seeder
                 ['hakakses' => 'Super Admin']
             ))
             ->create();
-        // HakAkses::factory()
-        //     ->state(new Sequence(
-        //         ['hakakses' => 'super admin']
-        //     ))
-        //     ->create();
+        // Seeder JABATAN
+        Jabatan::factory()
+            ->state(new Sequence(
+                [
+                    'nama_jabatan' => 'Manager',
+                    'gaji_pokok' => 1500000,
+                ]
+            ))
+            ->create();
+        Jabatan::factory()
+            ->state(new Sequence(
+                [
+                    'nama_jabatan' => 'Staff',
+                    'gaji_pokok' => 1000000,
+                ],
+            ))
+            ->create();
 
         // Seeder USER
         User::factory()
@@ -51,6 +64,7 @@ class DatabaseSeeder extends Seeder
                     'id'=>'U0001',
                     'email' => 'admin@gmail.com',
                     'id_hakakses' => 1,
+                    'id_jabatan' => 1,
                     'nama' => 'Admin',
                     'no_hp' => '080000000000',
                     'password' => bcrypt('12341234')
@@ -63,6 +77,7 @@ class DatabaseSeeder extends Seeder
                     'id'=>'U0002',
                     'email' => 'user@gmail.com',
                     'id_hakakses' => 2,
+                    'id_jabatan' => 2,
                     'nama' => 'User',
                     'no_hp' => '088888888888',
                     'password' => bcrypt('12341234'),
@@ -75,6 +90,7 @@ class DatabaseSeeder extends Seeder
                     'id'=>'U0003',
                     'email' => 'super@gmail.com',
                     'id_hakakses' => 3,
+                    'id_jabatan' => 1,
                     'nama' => 'User',
                     'no_hp' => '088888888888',
                     'password' => bcrypt('12341234'),
@@ -93,8 +109,18 @@ class DatabaseSeeder extends Seeder
                 ['jenis_transaksi' => 'Penggajian']
             ))
             ->create();
+        Jenis_Transaksi::factory()
+            ->state(new Sequence(
+                ['jenis_transaksi' => 'Kontrak Iklan']
+            ))
+            ->create();
+        Jenis_Transaksi::factory()
+            ->state(new Sequence(
+                ['jenis_transaksi' => 'PreOrder']
+            ))
+            ->create();
 
         // Seeder Obat
-        Obat::factory(50)->create();
+        Barang::factory(50)->create();
     }
 }

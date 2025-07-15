@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\HakAkses;
+use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
@@ -17,20 +18,36 @@ class KaryawanController extends Controller
 {
     function index(){
         $hakakses = HakAkses::all();
+        $jabatan = Jabatan::all();
         $data = [
             'menu' => 'Karyawan',
             'hakakses' => $hakakses,
+            'jabatan' => $jabatan,
         ];
         return view('admin.karyawan', $data );
     }
-    function karyawan(){
-        $users = User::with('hakakses')->get();
-        return DataTables::of($users)
+    function karyawan()
+{
+    // Mengambil data user dengan relasi 'hakakses' dan 'jabatan'.
+    // Menggunakan 'with' sangat penting untuk menghindari masalah N+1 query.
+    $users = User::with(['hakakses', 'jabatan'])->get();
+
+    return DataTables::of($users)
         ->addColumn('hakakses', function ($user) {
-            return $user->hakakses ? $user->hakakses->hakakses : 'N/A';
+            // Menggunakan nullsafe operator (PHP 8+) untuk keamanan.
+            // Ini akan mengembalikan null jika relasi 'hakakses' tidak ada,
+            // lalu '??' akan memberikan nilai default 'N/A'.
+            return $user->hakakses?->hakakses ?? 'N/A';
         })
+        ->addColumn('jabatan', function ($user) {
+            // Lakukan hal yang sama untuk jabatan.
+            // PENTING: Pastikan 'nama_jabatan' adalah nama kolom yang benar di tabel jabatan Anda.
+            // Jika nama kolomnya berbeda (misal: 'nama' atau 'jabatan'), ganti di bawah ini.
+            return $user->jabatan?->nama_jabatan ?? 'N/A';
+        })
+        // ->rawColumns(...) tidak diperlukan di sini karena kita tidak mengeluarkan HTML.
         ->make(true);
-    }
+}
     public function getHakAksesById($id)
     {
         // Retrieve HakAkses by ID
@@ -42,6 +59,17 @@ class KaryawanController extends Controller
 
         return response()->json(['error' => 'HakAkses not found'], 404);
     }
+    public function getJabatanById($id)
+    {
+        // Retrieve HakAkses by ID
+        $jabatan = Jabatan::find($id);
+
+        if ($jabatan) {
+            return response()->json(['jabatan' => $jabatan->jabatan]);  // Assuming 'hakakses' is the name column
+        }
+
+        return response()->json(['error' => 'Jabatan not found'], 404);
+    }
 
     function update(Request $request)
     {
@@ -52,6 +80,7 @@ class KaryawanController extends Controller
                 'nama_karyawan' => 'required|string|max:255',
                 'femail' => 'required|string|max:255',
                 'fhakakses' => 'required|numeric',
+                'fjabatan' => 'required',
                 'fno_hp' => 'required|numeric',
             ]);
 
@@ -62,6 +91,7 @@ class KaryawanController extends Controller
             $User->nama = $request->nama_karyawan;
             $User->email = $request->femail;
             $User->id_hakakses = $request->fhakakses;
+            $User->id_jabatan = $request->fjabatan;
             $User->no_hp = $request->fno_hp;
             $User->save();
 

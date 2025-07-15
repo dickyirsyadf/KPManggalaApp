@@ -15,11 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string("id_karyawan");
             $table->string("nama");
-            $table->string("bagian");
-            $table->integer('jumlah_hadir');
-            $table->integer("gaji_perhari");
-            $table->integer("absen");
-            $table->integer("bonus");
+            $table->string("jabatan");
+            // $table->string("periode_gaji");
+            // $table->string("tanggal_hitung_gaji");
+            $table->integer('gaji_pokok');
+            $table->integer("jml_hr_kerja");
+            $table->integer("jml_hadir");
+            $table->integer("jml_absen");
+            $table->integer("jml_izin");
+            $table->integer("jml_sakit");
+            $table->integer("jml_terlambat");
+            $table->integer("jml_lembur");
             $table->integer("gaji_bersih");
             $table->timestamps();
 

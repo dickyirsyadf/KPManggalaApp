@@ -100,9 +100,9 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="{{asset('admin/obat')}}" class="sidebar-link">
+                            <a href="{{asset('admin/barang')}}" class="sidebar-link">
                                 <i class="bi bi-record-fill"></i>
-                                <span>Obat</span>
+                                <span>Barang</span>
                             </a>
                         </li>
                         <li>
