@@ -8,11 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Penggajian extends Model
 {
     use HasFactory;
-    protected $fillable = ['id_karyawan', 'nama', 'bagian', 'tgl_terima_gaji'];
+    protected $fillable = [
+    'id_penggajian',
+    'id_karyawan',
+    'nama',
+    'jabatan',
+    'periode_gaji',
+    'tgl_terima_gaji'];
     protected $table = 'penggajian';
 
     public function users()
     {
-        return $this->belongsTo(User::class, 'id'); // Correct foreign key
+        return $this->belongsTo(User::class, 'id');
     }
 }

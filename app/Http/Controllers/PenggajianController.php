@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DaftarGaji;
-use App\Models\Pengeluaran; // <-- Tambahkan model Pengeluaran
+use App\Models\Pengeluaran;
+use App\Models\Penggajian; // <-- Tambahkan model Penggajian
 use App\Models\Potongan;
 use App\Models\SlipGaji;
 use App\Models\Tunjangan;
@@ -107,13 +108,14 @@ class PenggajianController extends Controller
 
             $user = User::find($validated['id_karyawan']);
             $daftarGaji = DaftarGaji::where('id_karyawan', $user->id)->first();
+            $periodeGaji = now()->subMonth()->format('F Y');
 
             // 1. Membuat Slip Gaji
             SlipGaji::create([
                 'id_karyawan' => $validated['id_karyawan'],
                 'nama' => $user->nama,
                 'jabatan' => $validated['jabatan'],
-                'periode' => now()->subMonth()->format('F Y'),
+                'periode' => $periodeGaji,
                 'gaji_pokok' => $validated['gaji_pokok'],
                 'tunjangan_jabatan' => $validated['tjg_jabatan'],
                 'pendapatan_lembur' => $validated['pendapatan_lembur'],
@@ -147,9 +149,19 @@ class PenggajianController extends Controller
                 'keterangan' => 'Penggajian ' . $user->nama,
             ]);
 
+            // 4. Membuat Catatan di Tabel Penggajian
+            Penggajian::create([
+                'id_penggajian' => 'PGJ-' . now()->format('Ymd') . '-' . mt_rand(1000, 9999),
+                'id_karyawan' => $validated['id_karyawan'],
+                'nama' => $user->nama,
+                'jabatan' => $validated['jabatan'],
+                'periode_gaji' => $periodeGaji,
+                'tgl_terima_gaji' => now(),
+            ]);
+
             DB::commit();
 
-            return redirect()->back()->with('success', 'Data Penggajian berhasil disimpan dan transaksi dicatat!');
+            return redirect()->back()->with('success', 'Data Penggajian berhasil disimpan dan semua transaksi terkait telah dicatat!');
 
         } catch (\Exception $e) {
             DB::rollBack();
