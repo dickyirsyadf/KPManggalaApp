@@ -9,25 +9,43 @@ class SlipGaji extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'id_karyawan',
         'nama',
-        'bagian',
+        'jabatan',
+        'periode',
+        'gaji_pokok',
+        'tunjangan_jabatan',
+        'pendapatan_lembur',
+        'total_pendapatan',
+        'potongan_absen',
+        'potongan_telat',
+        'total_potongan',
+        'gaji_bersih',
         'jumlah_hadir',
-        'tanggal',
-        'penerimaan',
-        'potongan',
-        'total',
-        'created_at',
-        'update_at'
+        'jumlah_sakit',
+        'jumlah_izin',
+        'jumlah_absen',
+        'jumlah_lembur',
+        'jumlah_terlambat',
     ];
 
     protected $table = 'slip_gaji';
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'tanggal' => 'date',
+    ];
 
-    public function daftarGaji()
-{
-    return $this->belongsTo(DaftarGaji::class);
-}
-
+    // Nonaktifkan timestamps default jika Anda tidak memiliki kolom 'created_at' dan 'updated_at'
+    // public $timestamps = false;
 }

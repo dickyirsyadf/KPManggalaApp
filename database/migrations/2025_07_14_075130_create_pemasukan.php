@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->integer('jumlah')->default(0);
             $table->string('sumber_pemasukan');
+            $table->string('keterangan');
             $table->timestamps();
         });
     }

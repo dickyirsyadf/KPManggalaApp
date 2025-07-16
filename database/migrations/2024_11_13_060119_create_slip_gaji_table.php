@@ -15,12 +15,22 @@ return new class extends Migration
             $table->id();
             $table->string("id_karyawan");
             $table->string("nama");
-            $table->string("bagian");
-            $table->integer('jumlah_hadir');
-            $table->dateTime("tanggal");
-            $table->integer("penerimaan");
-            $table->integer("potongan");
-            $table->integer("total");
+            $table->string("jabatan");
+            $table->date("periode");
+            $table->integer("gaji_pokok");
+            $table->integer("tunjangan_jabatan");
+            $table->integer("pendapatan_lembur");
+            $table->integer('total_pendapatan');
+            $table->integer("potongan_absen");
+            $table->integer("potongan_telat");
+            $table->integer("total_potongan");
+            $table->integer("gaji_bersih");
+            $table->integer("jumlah_hadir");
+            $table->integer("jumlah_sakit");
+            $table->integer("jumlah_izin");
+            $table->integer("jumlah_absen");
+            $table->integer("jumlah_lembur");
+            $table->integer("jumlah_terlambat");
             $table->timestamps();
 
             $table->foreign('id_karyawan')->references('id')->on('users')->onDelete('cascade');

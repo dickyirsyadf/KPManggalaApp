@@ -11,61 +11,105 @@
         <div class="card">
             <div class="card-header">
                 <h4>Formulir Penggajian</h4>
+                <p>Pilih karyawan untuk menghitung rincian gaji bulan sebelumnya.</p>
+            </div>
+            <div class="card-body">
                 <form action="{{ route('penggajian.store') }}" method="POST" class="row g-3">
                     @csrf
                     <div class="col-md-6">
-                        <label for="id_karyawan" class="form-label">Nama</label>
+                        <label for="id_karyawan" class="form-label">Nama Karyawan</label>
                         <select class="form-select" name="id_karyawan" id="id_karyawan" required>
-                            <option value="" disabled selected>Pilih Nama</option>
-                            @foreach($daftarGaji as $gaji)
-                                <option value="{{ $gaji->id_karyawan }}">{{ $gaji->nama }}</option>
+                            <option value="" disabled selected>Pilih Nama Karyawan</option>
+                            @foreach($daftarKaryawan as $gaji)
+                                <option value="{{ $gaji->id_karyawan }}">{{ $gaji->nama ?? 'Nama Tidak Ditemukan' }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label for="jabatan" class="form-label">Jabatan</label>
-                        <input type="text" class="form-control" name="jabatan" id="jabatan" readonly>
+                        <input type="text" class="form-control" id="jabatan" name="jabatan" readonly>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6>Rincian Pendapatan</h6>
+                    <div class="col-md-4">
+                        <label for="gaji_pokok_display" class="form-label">Gaji Pokok</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control" id="gaji_pokok_display" readonly>
+                            <input type="hidden" name="gaji_pokok" id="gaji_pokok">
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="gaji_pokok" class="form-label">Gaji Pokok</label>
-                        <input type="number" class="form-control" name="gaji_pokok" id="gaji_pokok" readonly>
+                        <label for="tjg_jabatan_display" class="form-label">Tunjangan Jabatan</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control" id="tjg_jabatan_display" readonly>
+                            <input type="hidden" name="tjg_jabatan" id="tjg_jabatan">
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="ptg_absen" class="form-label">Potongan Absen</label>
-                        <input type="number" class="form-control" name="ptg_absen" id="ptg_absen" readonly>
+                        <label for="pendapatan_lembur_display" class="form-label">Pendapatan Lembur</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control" id="pendapatan_lembur_display" readonly>
+                            <input type="hidden" name="pendapatan_lembur" id="pendapatan_lembur">
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6>Rincian Potongan</h6>
+                    <div class="col-md-6">
+                        <label for="ptg_absen_display" class="form-label">Potongan Absen</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control" id="ptg_absen_display" readonly>
+                            <input type="hidden" name="ptg_absen" id="ptg_absen">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ptg_telat_display" class="form-label">Potongan Telat</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control" id="ptg_telat_display" readonly>
+                            <input type="hidden" name="ptg_telat" id="ptg_telat">
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6>Total</h6>
+                    <div class="col-md-4">
+                        <label for="total_pendapatan_display" class="form-label">Total Pendapatan</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control bg-light-success" id="total_pendapatan_display" readonly>
+                            <input type="hidden" name="total_pendapatan" id="total_pendapatan">
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="ptg_telat" class="form-label">Potongan Telat</label>
-                        <input type="number" class="form-control" name="ptg_telat" id="ptg_telat" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="total_ptg" class="form-label">Total Potongan</label>
-                        <input type="number" class="form-control" name="total_ptg" id="total_ptg" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="tjg_jabatan" class="form-label">Tunjangan Jabatan</label>
-                        <input type="number" class="form-control" name="tjg_jabatan" id="tjg_jabatan" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="pendapatan_lembur" class="form-label">Pendapatan Lembur</label>
-                        <input type="number" class="form-control" name="pendapatan_lembur" id="pendapatan_lembur" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="total_pendapatan" class="form-label">Total Pendapatan</label>
-                        <input type="number" class="form-control" name="total_pendapatan" id="total_pendapatan" readonly>
+                        <label for="total_ptg_display" class="form-label">Total Potongan</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control bg-light-danger" id="total_ptg_display" readonly>
+                            <input type="hidden" name="total_ptg" id="total_ptg">
+                        </div>
                     </div>
                      <div class="col-md-4">
-                        <label for="gaji_bersih" class="form-label">Gaji Bersih</label>
-                        <input type="number" class="form-control" name="gaji_bersih" id="gaji_bersih" readonly>
+                        <label for="gaji_bersih_display" class="form-label">Gaji Bersih</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" class="form-control bg-light-primary" id="gaji_bersih_display" readonly>
+                            <input type="hidden" name="gaji_bersih" id="gaji_bersih">
+                        </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 mt-4">
                         <button type="submit" class="btn btn-primary">Simpan & Buat Slip Gaji</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Slip Gaji Section -->
+        <!-- Riwayat Slip Gaji -->
         <div class="card mt-4">
             <div class="card-header">
                 <h4>Riwayat Slip Gaji</h4>
@@ -75,19 +119,19 @@
                     <thead>
                         <tr>
                             <th>Nama</th>
-                            <th>Tanggal</th>
+                            <th>Periode</th>
                             <th>Total Diterima</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($slipGajis as $slipGaji)
+                        @foreach($slipGajis as $slip)
                             <tr>
-                                <td>{{ $slipGaji->nama }}</td>
-                                <td>{{ $slipGaji->tanggal }}</td>
-                                <td>Rp {{ number_format($slipGaji->total, 0, ',', '.') }}</td>
+                                <td>{{ $slip->nama }}</td>
+                                <td>{{ $slip->periode }}</td>
+                                <td>Rp {{ number_format($slip->gaji_bersih, 0, ',', '.') }}</td>
                                 <td>
-                                    <a href="{{ route('penggajian.print', $slipGaji->id) }}" target="_blank" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('penggajian.print', $slip->id) }}" target="_blank" class="btn btn-sm btn-primary">
                                         Print
                                     </a>
                                 </td>
@@ -103,29 +147,29 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- AJAX Script dengan Mode Debug -->
+<!-- AJAX Script -->
 <script>
-    $(document).ready(function () {
-        console.log('DEBUG: Skrip Penggajian Dimuat.');
+    function formatRupiah(angka) {
+        if (angka === null || isNaN(angka)) {
+            return '0';
+        }
+        return parseInt(angka).toLocaleString('id-ID');
+    }
 
+    $(document).ready(function () {
         $('#id_karyawan').change(function () {
             var userId = $(this).val();
-            console.log('DEBUG: Karyawan dipilih. ID:', userId);
-
             if (userId) {
-                // Menggunakan URL hardcoded seperti pada kode awal Anda
                 const finalUrl = "{{ url('/admin/penggajian/getGaji') }}/" + userId;
-                console.log('DEBUG: Meminta data dari URL:', finalUrl);
-
                 $.ajax({
                     url: finalUrl,
                     type: "GET",
                     dataType: "json",
                     success: function (data) {
-                        console.log('DEBUG: Data berhasil diterima dari server:', data);
-
-                        // Mengisi form dengan data yang didapat dari controller
+                        // Mengisi input Jabatan
                         $('#jabatan').val(data.jabatan);
+
+                        // Mengisi input tersembunyi (hidden) dengan nilai mentah
                         $('#gaji_pokok').val(data.gaji_pokok);
                         $('#ptg_absen').val(data.potongan_absen);
                         $('#ptg_telat').val(data.potongan_telat);
@@ -135,22 +179,28 @@
                         $('#total_pendapatan').val(data.total_pendapatan);
                         $('#gaji_bersih').val(data.gaji_bersih);
 
-                        console.log('DEBUG: Form telah diisi.');
+                        // Mengisi input yang terlihat (text) dengan nilai yang sudah diformat
+                        $('#gaji_pokok_display').val(formatRupiah(data.gaji_pokok));
+                        $('#ptg_absen_display').val(formatRupiah(data.potongan_absen));
+                        $('#ptg_telat_display').val(formatRupiah(data.potongan_telat));
+                        $('#total_ptg_display').val(formatRupiah(data.total_potongan));
+                        $('#tjg_jabatan_display').val(formatRupiah(data.tunjangan_jabatan));
+                        $('#pendapatan_lembur_display').val(formatRupiah(data.pendapatan_lembur));
+                        $('#total_pendapatan_display').val(formatRupiah(data.total_pendapatan));
+                        $('#gaji_bersih_display').val(formatRupiah(data.gaji_bersih));
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR) {
                         // Reset form jika terjadi error
                         $('form')[0].reset();
                         $('#id_karyawan').val('');
-                        alert('Data gaji untuk karyawan ini tidak ditemukan!');
-                        console.error("DEBUG: AJAX Error:", {
-                            status: jqXHR.status,
-                            statusText: jqXHR.statusText,
-                            responseText: jqXHR.responseText,
-                            textStatus: textStatus,
-                            errorThrown: errorThrown
-                        });
+                        alert('Data gaji untuk karyawan ini tidak ditemukan atau tidak lengkap.');
+                        console.error("AJAX Error:", jqXHR.responseText);
                     }
                 });
+            } else {
+                 // Reset form jika tidak ada user yang dipilih
+                 $('form')[0].reset();
+                 $('#id_karyawan').val('');
             }
         });
     });
