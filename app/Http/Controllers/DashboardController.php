@@ -10,13 +10,14 @@ use App\Models\DetailPenjualan;
 use App\Models\Pemasukan;
 use App\Models\Pengeluaran;
 use App\Models\Absensi;
+use App\Models\KontrakIklan; // <-- Tambahkan model KontrakIklan
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Set zona waktu ke Asia/Jakarta
+        // Set zona waktu dan lokal ke Indonesia
         Carbon::setLocale('id');
         $today = Carbon::today();
         $startOfMonth = Carbon::now()->startOfMonth();
@@ -28,12 +29,11 @@ class DashboardController extends Controller
             $query->whereBetween('tgl_penjualan', [$startOfMonth, $today]);
         })->sum('margin');
 
-
         // 2. Data untuk Grafik Penjualan 7 Hari Terakhir
         $salesData = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
-            $dayName = $date->isoFormat('dddd'); // Format hari dalam Bahasa Indonesia
+            $dayName = $date->isoFormat('dddd');
             $totalSales = Penjualan::whereDate('tgl_penjualan', $date)->sum('total_bayar');
             $salesData['labels'][] = $dayName;
             $salesData['data'][] = $totalSales;
@@ -44,25 +44,27 @@ class DashboardController extends Controller
             ->whereHas('penjualan', function ($query) use ($startOfMonth, $today) {
                 $query->whereBetween('tgl_penjualan', [$startOfMonth, $today]);
             })
-            ->with('barang') // Eager load data barang
+            ->with('barang')
             ->groupBy('id_barang')
             ->orderBy('total_qty', 'desc')
             ->limit(5)
             ->get();
 
         // 4. Status Absensi Dinamis
-        $absensiHariIni = Absensi::where('id_karyawan', Auth::id())
-            ->whereDate('tanggal', $today)
-            ->first();
-
-        $absensiStatus = 'belum_absen'; // Default status
+        $absensiHariIni = Absensi::where('id_karyawan', Auth::id())->whereDate('tanggal', $today)->first();
+        $absensiStatus = 'belum_absen';
         if ($absensiHariIni) {
-            if ($absensiHariIni->jam_keluar) {
-                $absensiStatus = 'sudah_pulang';
-            } else {
-                $absensiStatus = 'sudah_masuk';
-            }
+            $absensiStatus = $absensiHariIni->jam_keluar ? 'sudah_pulang' : 'sudah_masuk';
         }
+
+        // 5. Data Kontrak Iklan
+        $kontrakAktifCount = KontrakIklan::where('status', 'Sedang Tayang')->count();
+        $kontrakAkanBerakhir = KontrakIklan::where('status', 'Sedang Tayang')
+            ->where('tanggal_selesai_kontrak', '>', $today)
+            ->where('tanggal_selesai_kontrak', '<=', $today->copy()->addDays(30))
+            ->orderBy('tanggal_selesai_kontrak', 'asc')
+            ->limit(3)
+            ->get();
 
         $data = [
             'menu' => 'Dashboard',
@@ -73,6 +75,8 @@ class DashboardController extends Controller
             'produkTerlaris' => $produkTerlaris,
             'absensiStatus' => $absensiStatus,
             'absensiHariIni' => $absensiHariIni,
+            'kontrakAktifCount' => $kontrakAktifCount,
+            'kontrakAkanBerakhir' => $kontrakAkanBerakhir,
         ];
 
         return view('admin.dashboard', $data);

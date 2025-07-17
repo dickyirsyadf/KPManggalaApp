@@ -43,11 +43,11 @@ class KontrakIklanController extends Controller
 
         try {
             $tglMulai = Carbon::parse($request->tanggal_mulai_kontrak);
-            $durasi = $request->durasi ?? 30; // Default durasi 30 hari jika tidak diisi
+            $durasi = $request->durasi ?? 30;
             $tglSelesai = $tglMulai->copy()->addDays($durasi);
 
             KontrakIklan::create([
-                'id_kontrak' => 'IKL' . now()->format('Ymd') . Str::upper(Str::random(3)),
+                'id_kontrak' => 'IKL' . now()->format('ymd') . Str::upper(Str::random(3)),
                 'nama_client' => $request->nama_client,
                 'nama_media' => $request->nama_media,
                 'durasi' => $durasi,
@@ -60,8 +60,8 @@ class KontrakIklanController extends Controller
 
             return back()->with('success', 'Pengajuan kontrak iklan berhasil dibuat.');
         } catch (\Exception $e) {
-            Log::error('Gagal membuat kontrak iklan: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat membuat pengajuan.');
+            Log::error('Gagal membuat kontrak iklan: ');
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -84,40 +84,17 @@ class KontrakIklanController extends Controller
     {
         $request->validate(['status' => 'required|in:Diterima,Ditolak']);
 
-        DB::beginTransaction();
         try {
             $kontrak = KontrakIklan::findOrFail($id_kontrak);
             $kontrak->status = $request->status;
             $kontrak->dikonfirmasi_oleh = Auth::user()->nama;
             $kontrak->save();
 
-            // Jika status adalah 'Diterima', catat sebagai pemasukan
-            if ($request->status == 'Diterima') {
-                // 1. Buat entri di tabel transaksi
-                Transaksi::create([
-                    'id_karyawan' => Auth::id(),
-                    'no_transaksi' => $kontrak->id_kontrak,
-                    'id_jenis_transaksi' => 1, // Asumsi 1 = Pemasukan
-                    'nominal_transaksi' => $kontrak->biaya_iklan,
-                    'tanggal_transaksi' => now(),
-                ]);
-
-                // 2. Buat entri di tabel pemasukan
-                Pemasukan::create([
-                    'tanggal' => now(),
-                    'jumlah' => $kontrak->biaya_iklan,
-                    'sumber_pemasukan' => 'Kontrak Iklan',
-                    'keterangan' => 'Kontrak dengan ' . $kontrak->nama_client . ' di media ' . $kontrak->nama_media,
-                ]);
-            }
-
-            DB::commit();
             return back()->with('success', 'Status kontrak berhasil diubah.');
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Gagal update status kontrak: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan.');
+            Log::error('Gagal update status kontrak: ');
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -130,9 +107,9 @@ class KontrakIklanController extends Controller
             $kontrak = KontrakIklan::where('id_kontrak', $id_kontrak)->where('status', 'Diterima')->firstOrFail();
             $kontrak->status = 'Sedang Tayang';
             $kontrak->save();
-            return back()->with('success', 'Status kontrak telah diubah menjadi "Sedang Tayang".');
+            return back()->with('success', 'Status kontrak telah diubah menjadi Sedang Tayang.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal mengubah status.');
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -141,13 +118,40 @@ class KontrakIklanController extends Controller
      */
     public function selesaikan($id_kontrak)
     {
+        DB::beginTransaction();
         try {
-            $kontrak = KontrakIklan::where('id_kontrak', $id_kontrak)->where('status', 'Sedang Tayang')->firstOrFail();
+            $kontrak = KontrakIklan::where('id_kontrak', $id_kontrak)
+                ->whereIn('status', ['Diterima', 'Sedang Tayang']) // Bisa diselesaikan dari status Diterima atau Sedang Tayang
+                ->firstOrFail();
+
+            // Ubah status kontrak menjadi 'Kontrak Selesai'
             $kontrak->status = 'Kontrak Selesai';
             $kontrak->save();
-            return back()->with('success', 'Kontrak telah diselesaikan.');
+
+            // 1. Buat entri di tabel transaksi
+            Transaksi::create([
+                'id_karyawan' => Auth::id(),
+                'no_transaksi' => $kontrak->id_kontrak,
+                'id_jenis_transaksi' => 3, // 3 = Kontrak Iklan
+                'nominal_transaksi' => $kontrak->biaya_iklan,
+                'tanggal_transaksi' => now(),
+            ]);
+
+            // 2. Buat entri di tabel pemasukan
+            Pemasukan::create([
+                'tanggal' => now(),
+                'jumlah' => $kontrak->biaya_iklan,
+                'sumber_pemasukan' => 'Kontrak Iklan',
+                'keterangan' => 'Penyelesaian kontrak dengan ' . $kontrak->nama_client . ' di media ' . $kontrak->nama_media,
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'Kontrak telah diselesaikan dan pemasukan telah dicatat.');
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menyelesaikan kontrak.');
+            DB::rollBack();
+            Log::error('Gagal menyelesaikan kontrak: ');
+            return back()->with('error', $e->getMessage());
         }
     }
 }

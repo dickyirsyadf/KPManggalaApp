@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\KontrakIklanController;
+use App\Http\Controllers\PreorderController;
 use App\Http\Controllers\DaftarGajiController;
 use App\Http\Controllers\DashboardController;
 use App\http\Controllers\KaryawanController;
@@ -65,12 +67,20 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('penjualan','index')->name('penjualan.index');
             Route::post('/penjualan', 'store')->name('penjualan.store');
         });
-        Route::controller(App\Http\Controllers\PreorderController::class)->group(function () {
+        Route::controller(PreorderController::class)->group(function () {
             Route::get('/preorder-staff', 'indexStaff')->name('preorder.staff');
             Route::post('/preorder-staff', 'store')->name('preorder.store');
             Route::get('/preorder-admin', 'indexAdmin')->name('preorder.admin');
             Route::post('/preorder/update-status/{id}', 'updateStatus')->name('preorder.updateStatus');
             Route::post('/preorder/selesaikan/{id}', 'selesaikan')->name('preorder.selesaikan');
+        });
+        Route::controller(KontrakIklanController::class)->group(function () {
+            Route::get('/kontrak-staff', 'indexStaff')->name('kontrak.staff');
+            Route::post('/kontrak-staff', 'store')->name('kontrak.store');
+            Route::get('/kontrak-admin', 'indexAdmin')->name('kontrak.admin');
+            Route::post('/kontrak/update-status/{id_kontrak}', 'updateStatus')->name('kontrak.updateStatus');
+            Route::post('/kontrak/update-tayang/{id_kontrak}', 'updateTayang')->name('kontrak.updateTayang');
+            Route::post('/kontrak/selesaikan/{id_kontrak}', 'selesaikan')->name('kontrak.selesaikan');
         });
         Route::controller(DaftarGajiController::class)->group(function () {
             Route::get('/daftargaji', 'index')->name('daftargaji.index');
@@ -86,8 +96,6 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::put('/absensi/update','update')->name('absensi.update');
             Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');
             Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus');
-
-
         });
         Route::controller(PenggajianController::class)->group(function () {
             Route::get('/penggajian', 'index')->name('penggajian.index');

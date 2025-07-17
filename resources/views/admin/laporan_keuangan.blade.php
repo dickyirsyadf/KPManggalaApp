@@ -148,7 +148,7 @@
             <div class="col-md-4">
                 <div class="card summary-card">
                     <div class="icon text-primary"><i class="bi bi-wallet2"></i></div>
-                    <h6>Keuntungan (Margin)</h6>
+                    <h6>Keuntungan Penjualan (Margin)</h6>
                     <h4 class="text-primary">Rp {{ number_format($totalMargin, 0, ',', '.') }}</h4>
                 </div>
             </div>

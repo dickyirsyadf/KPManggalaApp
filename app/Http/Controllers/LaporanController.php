@@ -14,11 +14,10 @@ class LaporanController extends Controller
         $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', now()->endOfMonth()->toDateString());
 
-        // PERBAIKAN: Menggunakan whereDate untuk memastikan filter tanggal lebih akurat
         $transaksi = Transaksi::with(['jenis_transaksi', 'detail_penjualans'])
             ->whereDate('tanggal_transaksi', '>=', $startDate)
             ->whereDate('tanggal_transaksi', '<=', $endDate)
-            ->orderBy('tanggal_transaksi', 'desc') // Urutkan berdasarkan data terbaru untuk tampilan web
+            ->orderBy('tanggal_transaksi', 'desc')
             ->get();
 
         $totalDebet = 0;
@@ -27,21 +26,34 @@ class LaporanController extends Controller
 
         // Lakukan kalkulasi total terlebih dahulu
         foreach ($transaksi as $item) {
-            if ($item->id_jenis_transaksi == 1) { // Pemasukan / Penjualan
+            // Pemasukan: Penjualan (1) dan Kontrak Iklan (3)
+            if (in_array($item->id_jenis_transaksi, [1, 3])) {
                 $totalDebet += $item->nominal_transaksi;
-                if ($item->detail_penjualans) {
+                // Margin hanya dihitung dari penjualan
+                if ($item->id_jenis_transaksi == 1 && $item->detail_penjualans) {
                     $totalMargin += $item->detail_penjualans->sum('margin');
                 }
-            } else { // Pengeluaran
+            }
+            // Pengeluaran: Penggajian (2) dan Preorder (4)
+            elseif (in_array($item->id_jenis_transaksi, [2, 4])) {
                 $totalKredit += $item->nominal_transaksi;
             }
         }
 
         // Map data untuk ditampilkan di view
         $laporan = $transaksi->map(function ($item) {
-            $debet = ($item->id_jenis_transaksi == 1) ? $item->nominal_transaksi : 0;
-            $kredit = ($item->id_jenis_transaksi == 2) ? $item->nominal_transaksi : 0;
-            $margin = ($debet > 0 && $item->detail_penjualans) ? $item->detail_penjualans->sum('margin') : 0;
+            $debet = 0;
+            $kredit = 0;
+            $margin = 0;
+
+            if (in_array($item->id_jenis_transaksi, [1, 3])) { // Pemasukan
+                $debet = $item->nominal_transaksi;
+                if ($item->id_jenis_transaksi == 1 && $item->detail_penjualans) {
+                    $margin = $item->detail_penjualans->sum('margin');
+                }
+            } elseif (in_array($item->id_jenis_transaksi, [2, 4])) { // Pengeluaran
+                $kredit = $item->nominal_transaksi;
+            }
 
             return [
                 'tanggal' => $item->tanggal_transaksi,
@@ -49,7 +61,7 @@ class LaporanController extends Controller
                 'debet' => $debet,
                 'kredit' => $kredit,
                 'margin' => $margin,
-                'total_bayar' => $debet,
+                'total_bayar' => $debet, // Untuk modal detail
             ];
         });
 
@@ -68,11 +80,10 @@ class LaporanController extends Controller
         $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', now()->endOfMonth()->toDateString());
 
-        // PERBAIKAN: Menggunakan whereDate untuk memastikan filter tanggal lebih akurat
         $transaksi = Transaksi::with(['jenis_transaksi', 'detail_penjualans'])
             ->whereDate('tanggal_transaksi', '>=', $startDate)
             ->whereDate('tanggal_transaksi', '<=', $endDate)
-            ->orderBy('tanggal_transaksi', 'asc') // Urutkan kronologis untuk PDF
+            ->orderBy('tanggal_transaksi', 'asc')
             ->get();
 
         $totalDebet = 0;
@@ -82,20 +93,18 @@ class LaporanController extends Controller
         $laporan = $transaksi->map(function ($item) use (&$totalDebet, &$totalKredit, &$totalMargin) {
             $debet = 0;
             $kredit = 0;
-            $margin = 0;
 
-            if ($item->id_jenis_transaksi == 1) {
+            if (in_array($item->id_jenis_transaksi, [1, 3])) { // Pemasukan
                 $debet = $item->nominal_transaksi;
-                if ($item->detail_penjualans) {
-                    $margin = $item->detail_penjualans->sum('margin');
+                if ($item->id_jenis_transaksi == 1 && $item->detail_penjualans) {
+                    $totalMargin += $item->detail_penjualans->sum('margin');
                 }
-            } else {
+            } elseif (in_array($item->id_jenis_transaksi, [2, 4])) { // Pengeluaran
                 $kredit = $item->nominal_transaksi;
             }
 
             $totalDebet += $debet;
             $totalKredit += $kredit;
-            $totalMargin += $margin;
 
             return [
                 'tanggal' => $item->tanggal_transaksi,

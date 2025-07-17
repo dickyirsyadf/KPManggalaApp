@@ -57,7 +57,28 @@
                         @endif
                     </ul>
                 </li>
+                <li class="sidebar-item has-sub {{ request()->is('admin/kontrak-*') ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-megaphone-fill"></i>
+                        <span>Kontrak Iklan</span>
+                    </a>
+                    <ul class="submenu {{ request()->is('admin/kontrak-*') ? 'active' : '' }}">
+                        {{-- Menu untuk Staff (id_hakakses = 2) --}}
+                        <li class="submenu-item {{ request()->is('admin/kontrak-staff') ? 'active' : '' }}">
+                            <a href="{{ route('kontrak.staff') }}">Pengajuan Kontrak</a>
+                        </li>
+                        @if(auth()->user()->id_hakakses == 2)
+                        @endif
 
+                        {{-- Menu untuk Admin (id_hakakses = 1) --}}
+                        <li class="submenu-item {{ request()->is('admin/kontrak-admin') ? 'active' : '' }}">
+                            <a href="{{ route('kontrak.admin') }}">Persetujuan Kontrak</a>
+                        </li>
+                        @if(auth()->user()->id_hakakses == 1)
+                        @endif
+                    </ul>
+                </li>
+                {{-- Menu Laporan hanya untuk Admin --}}
                 {{-- Menu Keuangan hanya untuk Admin --}}
                 @if(auth()->user()->id_hakakses == 1)
                 <li class="sidebar-title">Keuangan & Laporan</li>
