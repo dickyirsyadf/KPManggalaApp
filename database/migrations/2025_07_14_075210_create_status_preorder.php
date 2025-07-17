@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('status_preorder', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['Pending', 'Approved', 'Rejected'])->nullable(false);
+            $table->enum('status', ['Pending', 'Disetujui', 'Ditolak','Selesai'])->nullable(false);
             $table->timestamps();
         });
     }

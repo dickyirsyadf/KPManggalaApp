@@ -1,26 +1,96 @@
 @extends('admin.layouts.admin-master')
 @section('admin-master')
 
+{{-- CSS Kustom untuk Tampilan Baru --}}
+<style>
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: none;
+        transition: all 0.3s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+        padding: 1.5rem;
+    }
+    .card-title-custom {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+    }
+    .table thead th {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .table tbody tr:hover {
+        background-color: #2a2e45;
+    }
+    .btn {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, #435ebe, #5e72e4);
+        border: none;
+    }
+    .btn-danger {
+        background: linear-gradient(45deg, #dc3545, #f5365c);
+        border: none;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .action-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    .modal-header {
+        background: linear-gradient(45deg, #435ebe, #5e72e4);
+        color: white;
+    }
+    .modal-title {
+        color: white;
+    }
+    .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+</style>
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a>Master Data</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        {{$menu}}
-                    </li>
-                </ol>
-            </nav>
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Data {{$menu}}</h3>
+                <p class="text-subtitle text-muted">Kelola semua data karyawan.</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a>Master Data</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{$menu}}</li>
+                    </ol>
+                </nav>
+            </div>
         </div>
     </div>
 
     <section class="section">
         <div class="card">
-            <div class="card-header">
-                <h2>Data Karyawan</h2>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title-custom mb-0"><i class="bi bi-people-fill me-2"></i>Daftar Karyawan</h4>
+                {{-- Tombol Tambah Karyawan bisa ditambahkan di sini jika diperlukan --}}
             </div>
             <div class="card-body">
                 <table class="table table-striped" id="userTable">
@@ -31,333 +101,149 @@
                             <th>Jabatan</th>
                             <th>Email</th>
                             <th>No Handphone</th>
-                            <th>Hakakses</th>
-                            <th>Action</th>
+                            <th>Hak Akses</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </section>
 </div>
 
-<!-- Modal Tambah -->
-<div class="modal fade text-left modal-borderless" id="modal-form" tabindex="-1" role="dialog"
-    aria-labelledby="modal-form" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah {{$menu}}</h5>
-                <button type="button" class="close rounded-pill" data-bs-dismiss="modal" aria-label="Close">
-                    <i data-feather="x"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="/admin/tambahkaryawan" method="POST">
-                    @csrf
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input id="nama" name="nama" type="text" placeholder="Nama Karyawan" class="form-control"
-                                autocomplete="off" />
-                            <div class="form-control-icon">
-                                <i class="bi bi-person"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input id="email" name="email" type="text" placeholder="Email" class="form-control"
-                                autocomplete="off" />
-                            <div class="form-control-icon">
-                                <i class="bi bi-card-list"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input id="no_hp" name="no_hp" type="number" placeholder="No Handphone" class="form-control"
-                                autocomplete="off" />
-                            <div class="form-control-icon">
-                                <i class="bi bi-phone"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <select class="form-control" id="hakakses" name="id_hakakses" required>
-                                <option value="">Select Hak Akses</option>
-                                @foreach($hakakses as $hak)
-                                    <option value="{{ $hak->id }}">{{ $hak->hakakses }}</option>
-                                @endforeach
-                            </select>
-                            <div class="form-control-icon">
-                                <i class="bi bi-phone"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <select class="form-control" id="hakakses" name="id_hakakses" required>
-                                <option value="">Select Jabatan</option>
-                                @foreach($jabatan as $jbt)
-                                    <option value="{{ $jbt->id }}">{{ $jbt->jabatan }}</option>
-                                @endforeach
-                            </select>
-                            <div class="form-control-icon">
-                                <i class="bi bi-phone"></i>
-                            </div>
-                        </div>
-                    </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                    <i class="bx bx-x d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Close</span>
-                </button>
-                <button type="submit" id="submit-btn" class="btn btn-primary ms-1">
-                    <i class="bx bx-check d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Tambah {{$menu}} Sekarang</span>
-                </button>
-            </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- Modal Edit -->
-<div class="modal fade text-left modal-borderless modal-md" id="modal-form-edit" tabindex="-1" role="dialog" aria-labelledby="modal-form-edit" aria-hidden="true">
+<div class="modal fade" id="modal-form-edit" tabindex="-1" role="dialog" aria-labelledby="modal-form-edit-label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">
-                    <h3>Edit {{$menu}}</h3>
-                    <p class="text-subtitle text-muted">
-                        Tambahkan keterangan setiap mengubah data, agar memudahkan pembukuan
-                    </p>
-                </div>
+                <h5 class="modal-title" id="modal-form-edit-label">Edit {{$menu}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="{{ route('karyawan.update') }}">
                 @csrf
                 <div class="modal-body">
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="ID Karyawan" id="id_karyawan"
-                                name="id_karyawan" required autocomplete="off" readonly>
-                            <div class="form-control-icon">
-                                <i class="bi bi-file-earmark-binary"></i>
-                            </div>
-                        </div>
+                    <input type="hidden" id="id_karyawan" name="id_karyawan">
+                    <div class="form-group">
+                        <label for="nama_karyawan" class="form-label">Nama Karyawan</label>
+                        <input type="text" class="form-control" name="nama_karyawan" id="nama_karyawan" required>
                     </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Nama Karyawan" name="nama_karyawan" id="nama_karyawan" required
-                                autocomplete="default">
-                            <div class="form-control-icon">
-                                <i class="bi bi-person"></i>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="femail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="femail" name="femail" required>
                     </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="Email" id="femail" name="femail" required
-                                autocomplete="default">
-                            <div class="form-control-icon">
-                                <i class="bi bi-currency-dollar"></i>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="fno_hp" class="form-label">No Handphone</label>
+                        <input type="text" class="form-control" id="fno_hp" name="fno_hp" required>
                     </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <input type="text" class="form-control" placeholder="No Handphone" id="fno_hp" name="fno_hp" required
-                                autocomplete="default">
-                            <div class="form-control-icon">
-                                <i class="bi bi-currency-dollar"></i>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="fhakakses" class="form-label">Hak Akses</label>
+                        <select class="form-select" id="fhakakses" name="fhakakses" required>
+                            <option value="">Pilih Hak Akses</option>
+                            @foreach($hakakses as $hak)
+                                <option value="{{ $hak->id }}">{{ $hak->hakakses }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <select class="form-control" id="fhakakses" name="fhakakses" required>
-                                <option value="">Select Hak Akses</option>
-                                @foreach($hakakses as $hak)
-                                    <option value="{{ $hak->id }}">{{ $hak->hakakses }}</option>
-                                @endforeach
-                            </select>
-                            <div class="form-control-icon">
-                                <i class="bi bi-chat-right-text"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group has-icon-left">
-                        <div class="position-relative">
-                            <select class="form-control" id="fhakakses" name="fhakakses" required>
-                                <option value="">Select Hak Akses</option>
-                                @foreach($jabatan as $jbt)
-                                    <option value="{{ $jbt->id }}">{{ $jbt->jabatan }}</option>
-                                @endforeach
-                            </select>
-                            <div class="form-control-icon">
-                                <i class="bi bi-chat-right-text"></i>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="fjabatan" class="form-label">Jabatan</label>
+                        <select class="form-select" id="fjabatan" name="fjabatan" required>
+                            <option value="">Pilih Jabatan</option>
+                            @foreach($jabatan as $jbt)
+                                <option value="{{ $jbt->id }}">{{ $jbt->nama_jabatan }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                        <i class="bx bx-x d-block d-sm-none"></i>
-                        <span class="d-none d-sm-block">Close</span>
-                    </button>
-                    <button type="submit" class="btn btn-primary ms-1">
-                        Selesai Edit
-                    </button>
+                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary ms-1">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal Delete-->
-<div class="modal fade text-left modal-borderless modal-md" id="modal-delete" tabindex="-1" role="dialo" aria-labelledby="modal-delete" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
+<!-- Modal Delete -->
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="deleteModalLabel">Delete Item</h3>
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title text-white" id="modal-delete-label">Konfirmasi Hapus</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this item?
+                Apakah Anda yakin ingin menghapus karyawan <strong id="delete-karyawan-name"></strong>? Tindakan ini tidak dapat dibatalkan.
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Ya, Hapus</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<!-- Bootstrap JS (Optional) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- initialisasi DT -->
 <script>
-       $(document).ready(function () {
+    $(document).ready(function () {
         $('#userTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('karyawan.data') }}",
             columns: [
                 { data: 'id', name: 'id' },
-                { data: 'nama', name: 'nama', searchable: true },
-                { data: 'jabatan', name: 'jabatan', searchable: true, orderable: true },
-                { data: 'email', name: 'email',searchable: true },
+                { data: 'nama', name: 'nama' },
+                { data: 'jabatan.nama_jabatan', name: 'jabatan.nama_jabatan', defaultContent: '-' },
+                { data: 'email', name: 'email' },
                 { data: 'no_hp', name: 'no_hp' },
-                { data: 'hakakses', name: 'hakakses', searchable: true, orderable: true },
+                { data: 'hakakses.hakakses', name: 'hakakses.hakakses', defaultContent: '-' },
                 {
                     data: null,
+                    orderable: false,
+                    searchable: false,
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-sm btn-primary edit-btn"
+                            <button class="btn btn-sm btn-primary action-btn edit-btn"
                                     data-bs-toggle="modal" data-bs-target="#modal-form-edit"
-                                    data-id="${row.id}"
-                                    data-nama="${row.nama}"
-                                    data-email="${row.email}"
-                                    data-no_hp="${row.no_hp}"
-                                    data-hakakses="${row.id_hakakses}">
-                                Edit
+                                    data-id="${row.id}" data-nama="${row.nama}" data-email="${row.email}"
+                                    data-no_hp="${row.no_hp}" data-id_hakakses="${row.id_hakakses}" data-id_jabatan="${row.id_jabatan}">
+                                <i class="bi bi-pencil-fill"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger delete-btn"
-                                    data-id="${row.id}" data-bs-toggle="modal"
-                                    data-bs-target="#modal-delete">
-                                Delete
+                            <button class="btn btn-sm btn-danger action-btn delete-btn"
+                                    data-id="${row.id}" data-nama="${row.nama}" data-bs-toggle="modal" data-bs-target="#modal-delete">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         `;
                     },
                 },
             ],
-            pageLength: 10, // Set number of rows per page
-            lengthChange: false, // Optional: hide the page length dropdown
-            paging: true, // Ensure pagination is enabled
-            info: true, // Display info like "Showing X to Y of Z entries"
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json' }
         });
     });
-</script>
-<!-- passing data dari btn ke modal  -->
-<script>
+
     $(document).on('click', '.edit-btn', function () {
-        // Retrieve data from the button
-        const id = $(this).data('id');
-        const nama = $(this).data('nama');
-        const email = $(this).data('email');
-        const hakaksesId = $(this).data('hakakses');
-        const jabatanId = $(this).data('jabatan');
-        const no_hp = $(this).data('no_hp');
-        // Populate the modal form fields
-        $('#id_karyawan').val(id);
-        $('#nama_karyawan').val(nama);
-        $('#femail').val(email);
-        $('#fno_hp').val(no_hp);
-
-        $.ajax({
-            url: '/admin/karyawan/get-hakakses/' + hakaksesId,
-            type: 'GET',
-            success: function (response) {
-                if (response.hakakses) {
-                    // Set the hakakses dropdown to the correct value (ID of HakAkses)
-                    $('#fhakakses').val(hakaksesId); // Pre-select the hakakses dropdown option
-                } else {
-                    // Optionally handle the case where hakakses data is not found
-                    console.error('HakAkses data not found');
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching HakAkses data: " + error);
-            }
-        });
-        $.ajax({
-            url: '/admin/karyawan/get-jabatan/' + jabatanId,
-            type: 'GET',
-            success: function (response) {
-                if (response.hakakses) {
-                    // Set the hakakses dropdown to the correct value (ID of HakAkses)
-                    $('#fhakakses').val(jabatanId); // Pre-select the hakakses dropdown option
-                } else {
-                    // Optionally handle the case where hakakses data is not found
-                    console.error('Jabatan data not found');
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching Jabatan data: " + error);
-            }
-        });
-
-        // Show the modal
+        const data = $(this).data();
+        $('#id_karyawan').val(data.id);
+        $('#nama_karyawan').val(data.nama);
+        $('#femail').val(data.email);
+        $('#fno_hp').val(data.no_hp);
+        $('#fhakakses').val(data.id_hakakses);
+        $('#fjabatan').val(data.id_jabatan);
         $('#modal-form-edit').modal('show');
     });
-</script>
-<!-- Delete Data -->
-<script>
-     $('#userTable').on('click', '.delete-btn', function () {
+
+    $('#userTable').on('click', '.delete-btn', function () {
         var id = $(this).data('id');
-        var name = $(this).data('name');
-
-        // Set the item name in the modal
-        $('#itemName').text(name);
-
-        // Set the form action to the correct delete URL
+        var name = $(this).data('nama');
+        $('#delete-karyawan-name').text(name);
         $('#deleteForm').attr('action', '/admin/karyawan/' + id);
-
-        // Show the delete confirmation modal
-        $('#deleteModal').modal('show');
+        $('#modal-delete').modal('show');
     });
 </script>
 @endsection

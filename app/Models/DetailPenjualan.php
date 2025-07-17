@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetailPenjualan extends Model
 {
-    protected $fillable = ['id_penjualan', 'id_obat', 'qty', 'harga', 'subtotal','margin'];
+    // --- PERBAIKAN: Mengganti 'id_obat' menjadi 'id_barang' ---
+    protected $fillable = ['id_penjualan', 'id_barang', 'qty', 'harga', 'subtotal','margin'];
     protected $table = 'detail_penjualan';
 
     public function penjualan(): BelongsTo
@@ -19,9 +20,9 @@ class DetailPenjualan extends Model
     {
         return $this->belongsTo(Barang::class, 'id_barang', 'id');
     }
+
     public function transaksi()
     {
         return $this->belongsTo(Transaksi::class, 'id_penjualan', 'id');
     }
-
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("id_karyawan");
             $table->string("nama");
             $table->string("jabatan");
-            $table->date("periode");
+            $table->string("periode");
             $table->integer("gaji_pokok");
             $table->integer("tunjangan_jabatan");
             $table->integer("pendapatan_lembur");

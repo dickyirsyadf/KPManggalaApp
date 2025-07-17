@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig\Tangent;
 
 return new class extends Migration
 {
@@ -16,13 +15,17 @@ return new class extends Migration
             $table->id();
             $table->date('tanggal');
             $table->string('nama_karyawan');
-            $table->string('id_barang');
+
+            // Foreign Key to 'barang' table
+            $table->unsignedBigInteger('id_barang');
+            $table->foreign('id_barang')->references('id')->on('barang')->onDelete('cascade');
+
             $table->string('nama_barang');
-            $table->integer('jumlah')->default(0);
-            $table->integer('harga_beli')->default(0);
-            $table->integer('total_harga')->default(0);
-            $table->string('status')->default('pending'); // pending, approved, rejected
-            $table->string('status_dirubah')->nullable(); // Karyawan yang menyetujui
+            $table->integer('jumlah');
+            $table->integer('harga_beli');
+            $table->integer('total_harga');
+            $table->string('status')->default('Pending'); // Pending, Disetujui, Ditolak, Selesai
+            $table->string('status_dirubah_oleh')->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('preorder');
+        Schema::dropIfExists('preorders');
     }
 };

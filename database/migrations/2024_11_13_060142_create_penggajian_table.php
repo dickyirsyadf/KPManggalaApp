@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("id_karyawan");
             $table->string("nama");
             $table->string("jabatan");
-            $table->date("periode_gaji");
+            $table->string("periode_gaji");
             $table->date("tgl_terima_gaji");
             $table->timestamps();
 

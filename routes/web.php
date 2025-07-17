@@ -65,6 +65,13 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('penjualan','index')->name('penjualan.index');
             Route::post('/penjualan', 'store')->name('penjualan.store');
         });
+        Route::controller(App\Http\Controllers\PreorderController::class)->group(function () {
+            Route::get('/preorder-staff', 'indexStaff')->name('preorder.staff');
+            Route::post('/preorder-staff', 'store')->name('preorder.store');
+            Route::get('/preorder-admin', 'indexAdmin')->name('preorder.admin');
+            Route::post('/preorder/update-status/{id}', 'updateStatus')->name('preorder.updateStatus');
+            Route::post('/preorder/selesaikan/{id}', 'selesaikan')->name('preorder.selesaikan');
+        });
         Route::controller(DaftarGajiController::class)->group(function () {
             Route::get('/daftargaji', 'index')->name('daftargaji.index');
             Route::get('/daftargaji/data','data')->name('daftargaji.data');
@@ -95,7 +102,7 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('laporan-keuangan/export','exportLaporan')->name('laporan.export');
         });
         Route::controller(DashboardController::class)->group(function () {
-            Route::get('/dashboard', 'dashboard')->name('admin.dashboard');
+            Route::get('/dashboard', 'index')->name('admin.dashboard');
         });
     });
 });
