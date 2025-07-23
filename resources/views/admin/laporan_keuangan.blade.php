@@ -33,7 +33,7 @@
         border-bottom: 2px solid #dee2e6;
     }
     .table tbody tr:hover {
-        background-color: #f1f1f1;
+        background-color: #2a2e45;
     }
     .btn {
         border-radius: 8px;

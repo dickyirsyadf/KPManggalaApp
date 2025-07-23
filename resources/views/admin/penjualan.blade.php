@@ -42,7 +42,7 @@
     }
 
     .table tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.075);
+        background-color: #2a2e45;
     }
 
     /* Menambahkan border pada tabel */

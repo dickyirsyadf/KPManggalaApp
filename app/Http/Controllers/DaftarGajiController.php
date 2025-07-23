@@ -85,12 +85,9 @@ class DaftarGajiController extends Controller
             // Cari record berdasarkan id_karyawan, bukan primary key 'id'
             $gaji = DaftarGaji::where('id_karyawan', $request->id_karyawan)->firstOrFail();
 
-            // Update hanya gaji pokok, dan hitung ulang gaji bersih secara sederhana
+            // PERBAIKAN: Hapus pembaruan pada kolom 'gaji_bersih' yang tidak ada
             $gaji->update([
                 'gaji_pokok' => $request->gaji_pokok,
-                // Gaji bersih akan dihitung ulang oleh command,
-                // tapi kita bisa update di sini untuk konsistensi sementara.
-                'gaji_bersih' => $request->gaji_pokok,
             ]);
 
             return back()->with('success', 'Edit Gaji Berhasil');

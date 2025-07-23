@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="text-center text-bold text-sm fs-6">
                                     <p class="text-gray">
-                                        ( Aplikasi Keuangan Manggala FM Cianjur )
+                                        ( Sistem Informasi Keuangan Manggala FM Cianjur )
                                     </p>
                                 </div>
                             </div>

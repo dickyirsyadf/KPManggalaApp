@@ -12,6 +12,13 @@
     .btn-primary { background: linear-gradient(45deg, #435ebe, #5e72e4); border: none; }
     .btn-success { background: linear-gradient(45deg, #198754, #28a745); border: none; }
     .badge-status { padding: 0.5em 0.75em; font-size: 0.8rem; }
+    tr.disabled-row {
+        background-color: #e9ecef !important;
+        cursor: not-allowed;
+    }
+    tr.disabled-row input {
+        background-color: #f8f9fa;
+    }
 </style>
 
 <div class="page-heading">
@@ -33,7 +40,7 @@
                         <h4 class="card-title-custom"><i class="bi bi-box-seam me-2"></i>Barang dengan Stok Kurang dari 5</h4>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('preorder.store') }}" method="POST">
+                        <form id="preorderForm" action="{{ route('preorder.store') }}" method="POST">
                             @csrf
                             <div class="table-responsive">
                                 <table class="table table-striped">
@@ -41,22 +48,30 @@
                                         <tr>
                                             <th>Pilih</th>
                                             <th>Nama Barang</th>
-                                            <th>Stok Saat Ini</th>
+                                            <th>Stok / Status</th>
                                             <th>Harga Modal</th>
                                             <th style="width: 15%;">Jumlah Order</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($barangHampirHabis as $barang)
-                                            <tr>
+                                            @php
+                                                $isDisabled = in_array($barang->id, $preordersDalamProses);
+                                            @endphp
+                                            <tr class="{{ $isDisabled ? 'disabled-row' : '' }}">
                                                 <td>
-                                                    <input class="form-check-input checkbox-item" type="checkbox" name="items[{{ $barang->id }}][selected]" value="1">
+                                                    <input class="form-check-input checkbox-item" type="checkbox" name="items[{{ $barang->id }}][selected]" value="1" {{ $isDisabled ? 'disabled' : '' }}>
                                                 </td>
                                                 <td>{{ $barang->nama }}</td>
-                                                <td><span class="badge bg-light-danger">{{ $barang->stock }}</span></td>
+                                                <td>
+                                                    <span class="badge bg-light-danger">{{ $barang->stock }}</span>
+                                                    @if ($isDisabled)
+                                                        <span class="badge bg-light-info ms-1">Dalam Proses</span>
+                                                    @endif
+                                                </td>
                                                 <td>Rp {{ number_format($barang->harga_modal, 0, ',', '.') }}</td>
                                                 <td>
-                                                    <input type="number" class="form-control quantity-input" name="items[{{ $barang->id }}][jumlah]" placeholder="Qty" min="1">
+                                                    <input type="number" class="form-control quantity-input" name="items[{{ $barang->id }}][jumlah]" placeholder="Qty" min="1" {{ $isDisabled ? 'disabled' : '' }}>
                                                 </td>
                                             </tr>
                                         @empty
@@ -86,55 +101,53 @@
                         <h4 class="card-title-custom"><i class="bi bi-clock-history me-2"></i>Riwayat Pengajuan Anda</h4>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah</th>
-                                        <th>Total Harga</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($riwayatPreorder as $po)
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::parse($po->tanggal)->format('d M Y') }}</td>
-                                        <td>{{ $po->nama_barang }}</td>
-                                        <td>{{ $po->jumlah }}</td>
-                                        <td>Rp {{ number_format($po->total_harga, 0, ',', '.') }}</td>
-                                        <td>
-                                            @if($po->status == 'Pending')
-                                                <span class="badge bg-light-warning badge-status">Menunggu Persetujuan</span>
-                                            @elseif($po->status == 'Disetujui')
-                                                <span class="badge bg-light-success badge-status">Disetujui</span>
-                                            @elseif($po->status == 'Ditolak')
-                                                <span class="badge bg-light-danger badge-status">Ditolak</span>
-                                            @elseif($po->status == 'Selesai')
-                                                <span class="badge bg-light-secondary badge-status">Selesai</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($po->status == 'Disetujui')
-                                                <form action="{{ route('preorder.selesaikan', $po->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-sm btn-success">Barang Sampai</button>
-                                                </form>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">Anda belum pernah mengajukan preorder.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Total Harga</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($riwayatPreorder as $po)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($po->tanggal)->format('d M Y') }}</td>
+                                    <td>{{ $po->nama_barang }}</td>
+                                    <td>{{ $po->jumlah }}</td>
+                                    <td>Rp {{ number_format($po->total_harga, 0, ',', '.') }}</td>
+                                    <td>
+                                        @if($po->status == 'Pending')
+                                            <span class="badge bg-light-warning badge-status">Menunggu Persetujuan</span>
+                                        @elseif($po->status == 'Disetujui')
+                                            <span class="badge bg-light-success badge-status">Disetujui</span>
+                                        @elseif($po->status == 'Ditolak')
+                                            <span class="badge bg-light-danger badge-status">Ditolak</span>
+                                        @elseif($po->status == 'Selesai')
+                                            <span class="badge bg-light-secondary badge-status">Selesai</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($po->status == 'Disetujui')
+                                            <form action="{{ route('preorder.selesaikan', $po->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-success">Barang Sampai</button>
+                                            </form>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">Anda belum pernah mengajukan preorder.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -144,16 +157,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Dapatkan semua input kuantitas
     const quantityInputs = document.querySelectorAll('.quantity-input');
-
     quantityInputs.forEach(input => {
         input.addEventListener('input', function() {
-            // Temukan checkbox yang berada di baris yang sama
             const row = this.closest('tr');
             const checkbox = row.querySelector('.checkbox-item');
-
-            // Jika input kuantitas diisi (lebih dari 0), centang checkboxnya
             if (this.value > 0) {
                 checkbox.checked = true;
             } else {
@@ -161,6 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // PERUBAHAN: Blok console.log dihapus
 });
 </script>
 @endsection

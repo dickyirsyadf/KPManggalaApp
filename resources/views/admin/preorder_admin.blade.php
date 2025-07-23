@@ -7,7 +7,7 @@
     .card-header { background-color: transparent; border-bottom: 1px solid #eee; }
     .card-title-custom { font-size: 1.25rem; font-weight: 600; color: #333; }
     .table thead th { background-color: #f8f9fa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .table tbody tr:hover { background-color: #f1f1f1; }
+    .table tbody tr:hover { background-color: #2a2e45; }
     .btn { border-radius: 8px; font-weight: 500; }
     .btn-success { background: linear-gradient(45deg, #198754, #28a745); border: none; }
     .btn-danger { background: linear-gradient(45deg, #dc3545, #f5365c); border: none; }

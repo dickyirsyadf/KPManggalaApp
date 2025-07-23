@@ -26,28 +26,17 @@ class KaryawanController extends Controller
         ];
         return view('admin.karyawan', $data );
     }
-    function karyawan()
-{
-    // Mengambil data user dengan relasi 'hakakses' dan 'jabatan'.
-    // Menggunakan 'with' sangat penting untuk menghindari masalah N+1 query.
-    $users = User::with(['hakakses', 'jabatan'])->get();
 
-    return DataTables::of($users)
-        ->addColumn('hakakses', function ($user) {
-            // Menggunakan nullsafe operator (PHP 8+) untuk keamanan.
-            // Ini akan mengembalikan null jika relasi 'hakakses' tidak ada,
-            // lalu '??' akan memberikan nilai default 'N/A'.
-            return $user->hakakses?->hakakses ?? 'N/A';
-        })
-        ->addColumn('jabatan', function ($user) {
-            // Lakukan hal yang sama untuk jabatan.
-            // PENTING: Pastikan 'nama_jabatan' adalah nama kolom yang benar di tabel jabatan Anda.
-            // Jika nama kolomnya berbeda (misal: 'nama' atau 'jabatan'), ganti di bawah ini.
-            return $user->jabatan?->nama_jabatan ?? 'N/A';
-        })
-        // ->rawColumns(...) tidak diperlukan di sini karena kita tidak mengeluarkan HTML.
-        ->make(true);
-}
+    function karyawan()
+    {
+        // PERBAIKAN: Cukup muat relasi dengan 'with'.
+        // DataTables akan secara otomatis menangani relasi bersarang
+        // jika dipanggil dengan benar di sisi view (JavaScript).
+        $users = User::with(['hakakses', 'jabatan']);
+
+        return DataTables::of($users)->make(true);
+    }
+
     public function getHakAksesById($id)
     {
         // Retrieve HakAkses by ID
@@ -100,7 +89,6 @@ class KaryawanController extends Controller
         } catch (\Exception $e) {
             Log::error('User creation failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to add user. Please try again.');
-            // return back()->with('error' ,'Edit User Gagal! Isi Form Dengan Benar');
         }
     }
 
