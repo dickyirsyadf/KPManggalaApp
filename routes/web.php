@@ -9,7 +9,7 @@ use App\Http\Controllers\KontrakIklanController;
 use App\Http\Controllers\PreorderController;
 use App\Http\Controllers\DaftarGajiController;
 use App\Http\Controllers\DashboardController;
-use App\http\Controllers\KaryawanController;
+use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PenggajianController;
 use App\Http\Controllers\PenjualanController;

@@ -57,7 +57,7 @@ class BarangController extends Controller
         try {
             // Validate the incoming request
             $request->validate([
-                'id_barang' => 'required|exists:Barang,id',
+                'id_barang' => 'required|exists:barang,id',
                 'nama_barang' => 'required|string|max:255',
                 'fdeskripsi' => 'required|string|max:255',
                 'fhargaj' => 'required|numeric',
