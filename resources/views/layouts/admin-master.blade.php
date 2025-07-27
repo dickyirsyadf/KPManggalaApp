@@ -79,7 +79,7 @@
             const adjustCardWidths = () => {
                 const cards = document.querySelectorAll('.card');
                 cards.forEach(card => {
-                    card.style.width = '100%'; // Reset width for accurate recalculation
+                    // card.style.width = '100%'; // Reset width for accurate recalculation
                 });
             };
 
