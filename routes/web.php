@@ -80,11 +80,11 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('/daftargaji/{id}', 'show')->name('daftargaji.show');
         });
         Route::controller(AbsensiController::class)->group(function () {
-            Route::get('/absensi', 'indexAdmin')->name('absensi.index');
-            Route::post('/absensi/process', 'process')->name('absensi.process');
-            Route::put('/absensi/update','update')->name('absensi.update');
-            Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');
-            Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus');
+            Route::get('/absensi', 'indexAdmin')->name('absensi.index.admin');
+            Route::post('/absensi/process', 'process')->name('absensi.process.admin');
+            Route::put('/absensi/update','update')->name('absensi.update.admin');
+            Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status.admin');
+            Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus.admin');
         });
         Route::controller(PenggajianController::class)->group(function () {
             Route::get('/penggajian', 'index')->name('penggajian.index');
@@ -105,6 +105,10 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
 });
 Route::middleware(['auth', 'id_hakakses:2'])->group(function () {
     Route::prefix('karyawan')->group(function ()  {
+        Route::controller(BarangController::class)->group(function () {
+            Route::get('barang/data','barang')->name('karyawan.barang.data');
+            Route::post('/barang/edit', 'update')->name('karyawan.barang.update');
+        });
         Route::controller(PenjualanController::class)->group(function (){
             Route::get('penjualan','index')->name('penjualan.index');
             Route::post('/penjualan', 'store')->name('penjualan.store');

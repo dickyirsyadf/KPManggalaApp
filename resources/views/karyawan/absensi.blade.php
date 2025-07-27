@@ -34,7 +34,7 @@
         border-bottom: 2px solid #dee2e6;
     }
     .table tbody tr:hover {
-        background-color: #2a2e45;
+        background-color: #f1f3f5;
     }
     .btn {
         border-radius: 8px;
@@ -87,20 +87,35 @@
                         <h4 class="card-title-custom"><i class="bi bi-calendar-check-fill me-2"></i>Form Absensi</h4>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('absensi.process') }}" method="POST">
+                        {{-- Menentukan route form action berdasarkan role (admin/karyawan) --}}
+                        @php
+                            $formAction = Auth::user()->id_hakakses == 1 ? route('absensi.process.admin') : route('absensi.process');
+                        @endphp
+                        <form action="{{ $formAction }}" method="POST">
                             @csrf
                             <input type="hidden" name="action_type" id="action_type" value="kehadiran">
                             <div class="mb-3">
                                 <label for="id_karyawan" class="form-label">Karyawan</label>
-                                <select name="id_karyawan" id="id_karyawan" class="form-select">
+                                <select name="id_karyawan" id="id_karyawan" class="form-select" @if(isset($loggedInUserId)) disabled @endif>
                                     @foreach($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->nama }}</option>
+                                        <option value="{{ $user->id }}"
+                                            @if(isset($loggedInUserId) && $user->id == $loggedInUserId)
+                                            selected
+                                            @endif>
+                                            {{ $user->nama }}
+                                        </option>
                                     @endforeach
                                 </select>
+                                {{-- Jika dropdown di-disable, nilainya tidak akan terkirim saat submit. --}}
+                                {{-- Tambahkan hidden input untuk memastikan id_karyawan tetap terkirim. --}}
+                                @if(isset($loggedInUserId))
+                                    <input type="hidden" name="id_karyawan" value="{{ $loggedInUserId }}">
+                                    <input type="hidden" name="tanggal" id="date" class="form-control" value="{{ now()->toDateString() }}" required>
+                                @endif
                             </div>
                             <div class="mb-3">
                                 <label for="date" class="form-label">Tanggal</label>
-                                <input type="date" name="tanggal" id="date" class="form-control" value="{{ now()->toDateString() }}" required>
+                                <input type="date" name="tanggal" id="date" class="form-control" value="{{ now()->toDateString() }}" disabled>
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="other_status_checkbox">
@@ -123,13 +138,24 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title-custom"><i class="bi bi-table me-2"></i>Data Absensi Hari Ini</h4>
+                        {{-- Judul tabel dinamis berdasarkan view --}}
+                        <h4 class="card-title-custom"><i class="bi bi-table me-2"></i>
+                            @if(isset($loggedInUserId))
+                                Data Absensi Saya (45 Hari Terakhir)
+                            @else
+                                Data Absensi Karyawan (45 Hari Terakhir)
+                            @endif
+                        </h4>
                     </div>
                     <div class="card-body">
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
+                                    {{-- Hanya tampilkan kolom Karyawan di view Admin --}}
+                                    @if(!isset($loggedInUserId))
                                     <th>Karyawan</th>
+                                    @endif
+                                    <th>Tanggal</th>
                                     <th>Jam Masuk</th>
                                     <th>Jam Keluar</th>
                                     <th>Status</th>
@@ -140,7 +166,12 @@
                             <tbody>
                                 @forelse($absensi as $absen)
                                     <tr>
+                                        {{-- Hanya tampilkan nama karyawan di view Admin --}}
+                                        @if(!isset($loggedInUserId))
                                         <td>{{ $absen->user->nama }}</td>
+                                        @endif
+                                        {{-- Menambahkan kolom tanggal agar lebih jelas --}}
+                                        <td>{{ \Carbon\Carbon::parse($absen->tanggal)->isoFormat('dddd, D MMMM Y') }}</td>
                                         <td>{{ $absen->jam_masuk ? \Carbon\Carbon::parse($absen->jam_masuk)->format('H:i:s') : '-' }}</td>
                                         <td>{{ $absen->jam_keluar ? \Carbon\Carbon::parse($absen->jam_keluar)->format('H:i:s') : '-' }}</td>
                                         <td>
@@ -161,17 +192,25 @@
                                             @endif
                                         </td>
                                         <td>
+                                            {{-- Hanya admin yang bisa mengedit data absensi --}}
+                                            @if(Auth::user()->id_hakakses == 1)
                                             <button class="btn btn-sm btn-primary action-btn edit-btn"
                                                 data-bs-toggle="modal" data-bs-target="#modal-form-edit"
-                                                data-id="{{ $absen->id }}" data-tanggal="{{ $absen->tanggal }}"
-                                                data-jam-masuk="{{ $absen->jam_masuk }}" data-jam-keluar="{{ $absen->jam_keluar }}">
+                                                data-id="{{ $absen->id }}"
+                                                data-tanggal="{{ $absen->tanggal }}"
+                                                data-jam-masuk="{{ $absen->jam_masuk }}"
+                                                data-jam-keluar="{{ $absen->jam_keluar }}"
+                                                data-keterangan="{{ $absen->keterangan }}">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </button>
+                                            @else
+                                            -
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted">Belum ada data absensi untuk hari ini.</td>
+                                        <td colspan="7" class="text-center text-muted">Belum ada data absensi dalam 45 hari terakhir.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -194,7 +233,10 @@
                 <h5 class="modal-title" id="modal-form-edit-label">Edit Absensi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ route('absensi.update') }}">
+            @php
+                $updateAction = Auth::user()->id_hakakses == 1 ? route('absensi.update.admin') : route('absensi.update');
+            @endphp
+            <form method="POST" action="{{ $updateAction }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -203,13 +245,15 @@
                         <label for="editTanggal" class="form-label">Tanggal</label>
                         <input type="date" name="tanggal" class="form-control" id="editTanggal" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editJamMasuk" class="form-label">Jam Masuk</label>
-                        <input type="time" name="jam_masuk" class="form-control" id="editJamMasuk" step="1">
-                    </div>
-                    <div class="form-group">
-                        <label for="editJamKeluar" class="form-label">Jam Keluar</label>
-                        <input type="time" name="jam_keluar" class="form-control" id="editJamKeluar" step="1">
+                    <div id="edit-waktu-container">
+                        <div class="form-group">
+                            <label for="editJamMasuk" class="form-label">Jam Masuk</label>
+                            <input type="time" name="jam_masuk" class="form-control" id="editJamMasuk" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="editJamKeluar" class="form-label">Jam Keluar</label>
+                            <input type="time" name="jam_keluar" class="form-control" id="editJamKeluar" step="1">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="edit_status" class="form-label">Ubah Status Menjadi (Opsional)</label>
@@ -234,79 +278,108 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const statusCheckUrlTemplate = '{{ route("absensi.status", ["user" => "USER_ID", "tanggal" => "TANGGAL"]) }}';
-        const userSelect = document.getElementById('id_karyawan');
-        const dateInput = document.getElementById('date');
-        const submitButton = document.getElementById('submit-absensi-btn');
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const otherStatusCheckbox = document.getElementById('other_status_checkbox');
-        const otherStatusContainer = document.getElementById('other_status_container');
-        const statusSelect = document.getElementById('status');
-        const actionTypeInput = document.getElementById('action_type');
-        const editButtons = document.querySelectorAll('.edit-btn');
+document.addEventListener('DOMContentLoaded', function () {
+    // Cek apakah ini halaman karyawan dari keberadaan variabel loggedInUserId
+    const isKaryawanView = {{ isset($loggedInUserId) ? 'true' : 'false' }};
+    const loggedInUserId = '{{ $loggedInUserId ?? '' }}';
 
-        function updateButtonUI() {
-            if (otherStatusCheckbox.checked) {
-                const selectedStatus = statusSelect.value;
-                submitButton.textContent = 'Simpan Status ' + selectedStatus;
-                submitButton.disabled = false;
-                actionTypeInput.value = 'status';
-            } else {
-                actionTypeInput.value = 'kehadiran';
-                updateDynamicButtonState();
-            }
+    // Template URL untuk admin dan karyawan
+    const statusCheckUrlAdminTemplate = '{{ route("absensi.status.admin", ["user" => "USER_ID", "tanggal" => "TANGGAL"]) }}';
+    const statusCheckUrlKaryawanTemplate = '{{ route("absensi.status", ["user" => "USER_ID", "tanggal" => "TANGGAL"]) }}';
+
+    const userSelect = document.getElementById('id_karyawan');
+    const dateInput = document.getElementById('date');
+    const submitButton = document.getElementById('submit-absensi-btn');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const otherStatusCheckbox = document.getElementById('other_status_checkbox');
+    const otherStatusContainer = document.getElementById('other_status_container');
+    const statusSelect = document.getElementById('status');
+    const actionTypeInput = document.getElementById('action_type');
+    const editButtons = document.querySelectorAll('.edit-btn');
+    const editStatusSelect = document.getElementById('edit_status');
+    const editWaktuContainer = document.getElementById('edit-waktu-container');
+
+    function updateButtonUI() {
+        if (otherStatusCheckbox.checked) {
+            const selectedStatus = statusSelect.value;
+            submitButton.textContent = 'Simpan Status ' + selectedStatus;
+            submitButton.disabled = false;
+            actionTypeInput.value = 'status';
+        } else {
+            actionTypeInput.value = 'kehadiran';
+            updateDynamicButtonState();
         }
+    }
 
-        async function updateDynamicButtonState() {
-            const userId = userSelect.value;
-            const tanggal = dateInput.value;
-            if (!userId || !tanggal) return;
+    async function updateDynamicButtonState() {
+        // Di view karyawan, user ID sudah pasti. Di view admin, ambil dari dropdown.
+        const userId = isKaryawanView ? loggedInUserId : userSelect.value;
+        const tanggal = dateInput.value;
+        if (!userId || !tanggal) return;
 
-            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memeriksa...';
-            submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memeriksa...';
+        submitButton.disabled = true;
 
-            const finalUrl = statusCheckUrlTemplate.replace('USER_ID', userId).replace('TANGGAL', tanggal);
+        // Pilih URL template yang sesuai
+        const urlTemplate = isKaryawanView ? statusCheckUrlKaryawanTemplate : statusCheckUrlAdminTemplate;
+        const finalUrl = urlTemplate.replace('USER_ID', userId).replace('TANGGAL', tanggal);
 
-            try {
-                const response = await fetch(finalUrl, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                submitButton.textContent = data.text;
-                submitButton.disabled = data.disabled;
-            } catch (error) {
-                console.error('Gagal fetch:', error);
-                submitButton.textContent = 'Gagal Memuat';
-                submitButton.disabled = true;
-            }
-        }
-
-        otherStatusCheckbox.addEventListener('change', function() {
-            otherStatusContainer.style.display = this.checked ? 'block' : 'none';
-            updateButtonUI();
-        });
-
-        statusSelect.addEventListener('change', updateButtonUI);
-        userSelect.addEventListener('change', updateButtonUI);
-        dateInput.addEventListener('change', updateButtonUI);
-
-        updateButtonUI();
-
-        editButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const data = this.dataset;
-                document.getElementById('absensiId').value = data.id;
-                document.getElementById('editTanggal').value = data.tanggal;
-                document.getElementById('editJamMasuk').value = data.jamMasuk ? data.jamMasuk.substring(0, 8) : '';
-                document.getElementById('editJamKeluar').value = data.jamKeluar ? data.jamKeluar.substring(0, 8) : '';
-                document.getElementById('edit_status').value = "";
+        try {
+            const response = await fetch(finalUrl, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
             });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            submitButton.textContent = data.text;
+            submitButton.disabled = data.disabled;
+        } catch (error) {
+            console.error('Gagal fetch:', error);
+            submitButton.textContent = 'Gagal Memuat';
+            submitButton.disabled = true;
+        }
+    }
+
+    otherStatusCheckbox.addEventListener('change', function() {
+        otherStatusContainer.style.display = this.checked ? 'block' : 'none';
+        updateButtonUI();
+    });
+
+    statusSelect.addEventListener('change', updateButtonUI);
+    userSelect.addEventListener('change', updateButtonUI);
+    dateInput.addEventListener('change', updateButtonUI);
+
+    // Panggil sekali saat load untuk set state awal button
+    updateButtonUI();
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const data = this.dataset;
+            document.getElementById('absensiId').value = data.id;
+            document.getElementById('editTanggal').value = data.tanggal;
+            document.getElementById('editJamMasuk').value = data.jamMasuk ? data.jamMasuk.substring(0, 8) : '';
+            document.getElementById('editJamKeluar').value = data.jamKeluar ? data.jamKeluar.substring(0, 8) : '';
+
+            const editSelect = document.getElementById('edit_status');
+            editSelect.value = ""; // Reset ke default
+            if (data.keterangan === 'Sakit' || data.keterangan === 'Izin') {
+                 editSelect.value = data.keterangan;
+            }
+            editSelect.dispatchEvent(new Event('change'));
         });
     });
+
+    // Sembunyikan input jam jika status Sakit/Izin dipilih di modal edit
+    editStatusSelect.addEventListener('change', function() {
+        if (this.value === 'Sakit' || this.value === 'Izin') {
+            editWaktuContainer.style.display = 'none';
+        } else {
+            editWaktuContainer.style.display = 'block';
+        }
+    });
+
+});
 </script>
 
 @endsection

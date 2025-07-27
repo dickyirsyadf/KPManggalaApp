@@ -284,7 +284,7 @@
      $('#barangTable').DataTable({
          processing: true,
          serverSide: true,
-         ajax: "{{ route('barang.data') }}",
+         ajax: "{{ route('karyawan.barang.data') }}",
          columns: [
              { data: 'nama', name: 'nama' },
              { data: 'stock', name: 'stock' },

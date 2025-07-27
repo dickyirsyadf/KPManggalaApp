@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //Seeder Potongan
+        // Seeder Potongan
         Potongan::factory()
             ->state(new Sequence(
                 [
@@ -36,20 +36,15 @@ class DatabaseSeeder extends Seeder
             ->create();
         // Seeder HAK AKSES
         HakAkses::factory()
-        ->state(new Sequence(
-            ['hakakses' => 'admin']
-            ))
-            ->create();
-            HakAkses::factory()
             ->state(new Sequence(
-                ['hakakses' => 'user']
+                ['hakakses' => 'Admin']
                 ))
                 ->create();
-                HakAkses::factory()
+        HakAkses::factory()
             ->state(new Sequence(
-                ['hakakses' => 'Super Admin']
+                ['hakakses' => 'User']
                 ))
-            ->create();
+                ->create();
         // Seeder JABATAN
         Jabatan::factory()
             ->state(new Sequence(
@@ -114,19 +109,7 @@ class DatabaseSeeder extends Seeder
                 ],
             ))
             ->create();
-        User::factory()
-            ->state(new Sequence(
-                [
-                    'id'=>'U0003',
-                    'email' => 'super@gmail.com',
-                    'id_hakakses' => 3,
-                    'id_jabatan' => 1,
-                    'nama' => 'User',
-                    'no_hp' => '088888888888',
-                    'password' => bcrypt('12341234'),
-                ],
-            ))
-            ->create();
+
 
         // Seeder Jenis Transaksi
         Jenis_Transaksi::factory()
@@ -150,7 +133,6 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
 
-        // Seeder Obat
-        Barang::factory(50)->create();
+
     }
 }

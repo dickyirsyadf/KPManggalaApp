@@ -12,21 +12,56 @@ use Illuminate\Validation\Rule;
 
 class AbsensiController extends Controller
 {
-    public function indexAdmin()
+    /**
+     * Menampilkan halaman absensi untuk Admin.
+     * Data yang ditampilkan difilter berdasarkan pilihan di dropdown.
+     * Defaultnya menampilkan data admin yang sedang login.
+     */
+    public function indexAdmin(Request $request)
     {
         $users = User::all();
-        $absensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
+        $loggedInUserId = Auth::id();
+
+        // Ambil id karyawan dari request, jika tidak ada, gunakan id admin yang login
+        $selectedUserId = $request->input('id_karyawan', $loggedInUserId);
+
+        // Ambil data absensi untuk karyawan yang dipilih dalam 45 hari terakhir
+        $absensi = Absensi::with('user')
+                         ->where('id_karyawan', $selectedUserId)
+                         ->where('tanggal', '>=', Carbon::now()->subDays(45)->toDateString())
+                         ->orderBy('tanggal', 'desc')
+                         ->paginate(10);
+
+        // Pastikan parameter filter tetap ada di link pagination
+        $absensi->appends($request->all());
+
         $data = ['menu' => 'Absensi'];
 
-        return view('admin.absensi', compact('users', 'absensi', 'data'));
+        // Kirim semua data yang diperlukan ke view
+        return view('admin.absensi', compact('users', 'absensi', 'data', 'loggedInUserId', 'selectedUserId'));
     }
+
+    /**
+     * Menampilkan halaman absensi untuk Karyawan.
+     * Tabel hanya menampilkan data absensi milik karyawan yang login selama 45 hari terakhir.
+     */
     public function indexKaryawan()
     {
         $users = User::all();
-        $absensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
+        $loggedInUserId = Auth::id();
+        $selectedUserId = $loggedInUserId; // Untuk karyawan, yang dipilih selalu dirinya sendiri
+
+        // Mengambil data absensi HANYA untuk user yang login, dalam 45 hari terakhir
+        $absensi = Absensi::with('user')
+                         ->where('id_karyawan', $loggedInUserId)
+                         ->where('tanggal', '>=', Carbon::now()->subDays(45)->toDateString())
+                         ->orderBy('tanggal', 'desc')
+                         ->paginate(10);
+
         $data = ['menu' => 'Absensi'];
 
-        return view('karyawan.absensi', compact('users', 'absensi', 'data'));
+        // Mengirimkan ID user yang login ke view
+        return view('karyawan.absensi', compact('users', 'absensi', 'data', 'loggedInUserId', 'selectedUserId'));
     }
 
     /**
@@ -85,7 +120,8 @@ class AbsensiController extends Controller
             'kehadiran' => null,
             'keterangan' => $currentTime->gt($batasWaktuMasuk) ? 'Terlambat' : null,
         ]);
-        return redirect()->route('absensi.index')->with('success', 'Berhasil melakukan absensi masuk.');
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        return redirect()->route($redirectRoute)->with('success', 'Berhasil melakukan absensi masuk.');
     }
 
     private function handlePulang(Absensi $absensi)
@@ -107,7 +143,8 @@ class AbsensiController extends Controller
 
         $absensi->keterangan = !empty($keterangan) ? implode(', ', $keterangan) : null;
         $absensi->save();
-        return redirect()->route('absensi.index')->with('success', 'Berhasil melakukan absensi pulang.');
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        return redirect()->route($redirectRoute)->with('success', 'Berhasil melakukan absensi pulang.');
     }
 
     private function handleSakitIzin($id_karyawan, $tanggal, $status)
@@ -118,12 +155,10 @@ class AbsensiController extends Controller
             'kehadiran' => 0,
             'keterangan' => $status,
         ]);
-        return redirect()->route('absensi.index')->with('success', 'Status ' . $status . ' berhasil dicatat.');
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        return redirect()->route($redirectRoute)->with('success', 'Status ' . $status . ' berhasil dicatat.');
     }
 
-    /**
-     * Method update yang disempurnakan untuk menangani semua kasus edit.
-     */
     public function update(Request $request)
     {
         $request->validate([
@@ -142,7 +177,6 @@ class AbsensiController extends Controller
         $absensi = Absensi::findOrFail($request->id);
         $status = $request->edit_status;
 
-        // Jika status diubah menjadi Sakit atau Izin
         if ($status === 'Sakit' || $status === 'Izin') {
             $absensi->update([
                 'tanggal' => $request->tanggal,
@@ -151,7 +185,7 @@ class AbsensiController extends Controller
                 'jam_masuk' => null,
                 'jam_keluar' => null,
             ]);
-        } else { // Jika status tetap Hadir (hanya edit waktu)
+        } else {
             $timezone = 'Asia/Jakarta';
             $keteranganFinal = [];
 
@@ -182,7 +216,8 @@ class AbsensiController extends Controller
             ]);
         }
 
-        return redirect()->route('absensi.index')->with('success', 'Data absensi berhasil diperbarui.');
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        return redirect()->route($redirectRoute)->with('success', 'Data absensi berhasil diperbarui.');
     }
 
     public function cekStatusAbsensi(User $user, $tanggal)
