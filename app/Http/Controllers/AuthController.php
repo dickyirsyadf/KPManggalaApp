@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\ValidationException;
 
-use Carbon\Carbon;
-use Carbon\CarbonTimeZone;
-
-use App\Models\Activity_Admin;
 use App\Models\User;
+use App\Models\Jabatan;
 use Exception;
 
 class AuthController extends Controller
@@ -30,72 +28,75 @@ class AuthController extends Controller
                 'password' => 'required'
             ]);
 
-            $timeZone = new CarbonTimeZone('Asia/Jakarta');
-            $dateNow = Carbon::now($timeZone);
-
-            // Melakukan otentikasi
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
+                $request->session()->regenerate();
 
-                // Periksa hak akses
                 if ($user->id_hakakses === 1) {
-                    $request->session()->regenerate();
-                    Activity_Admin::create([
-                        'nama' => $user->nama,
-                        'keterangan' => 'Login',
-                        'no_transaksi' => 'Login',
-                        'tanggal' => $dateNow
-                    ]);
                     return redirect()->intended('admin/dashboard');
                 } elseif ($user->id_hakakses === 2) {
-                    $request->session()->regenerate();
                     return redirect()->intended('karyawan/dashboard');
-                } else{
-                    $request->session()->regenerate();
+                } else {
                     return redirect()->intended('superadmin/dashboard');
                 }
             }
 
-            return redirect('/')->with('error', 'Login Gagal. Coba Kembali');
+            return back()->with('error', 'Login Gagal. Email atau Password salah.');
         } catch (Exception $e) {
-            return redirect('/')->with('error', 'Terjadi kesalahan. Silakan coba kembali.');
+            return back()->with('error', 'Terjadi kesalahan. Silakan coba kembali.');
         }
     }
 
     function registrasi()
     {
+        $jabatan = Jabatan::all();
         return view('Auth.registrasi', [
-            'title' => 'Daftar Akun'
+            'title' => 'Daftar Akun',
+            'jabatan' => $jabatan
         ]);
     }
 
     function createUser(Request $request)
     {
         try {
-            $credentials = $request->validate([
-                'nama' => 'required',
-                'email' => 'required|email|unique:users',
-                'no_hp' => 'required|unique:users|min:11|numeric',
-                'password' => 'required|min:8',
-                'password1' => 'required|same:password'
+            $validatedData = $request->validate([
+                'nama' => 'required|string|max:255',
+                'alamat' => 'required|string|max:255',
+                'no_hp' => 'required|string|min:10|max:15',
+                'email' => 'required|email|unique:users,email',
+                'id_jabatan' => 'required|exists:jabatan,id',
+                'password' => 'required|min:8|confirmed',
             ]);
 
-            $credentials['id'] = $this->generateUserId();
-            $credentials['id_hakakses'] = 2;
-            $credentials['password'] = bcrypt($credentials['password']);
+            $jabatan = Jabatan::find($validatedData['id_jabatan']);
 
-            $user = User::create($credentials);
-            return redirect('/')->with('success', 'Daftar Akun Berhasil!');
+            User::create([
+                'id' => $this->generateUserId(),
+                'nama' => $validatedData['nama'],
+                'alamat' => $validatedData['alamat'],
+                'no_hp' => $validatedData['no_hp'],
+                'email' => $validatedData['email'],
+                'id_jabatan' => $validatedData['id_jabatan'],
+                'id_hakakses' => $validatedData['id_jabatan'], // Asumsi id_hakakses 1 untuk admin, 2 untuk karyawan
+                'password' => bcrypt($validatedData['password']),
+                'status_karyawan' => 'Aktif',
+            ]);
+
+            return redirect('/')->with('success', 'Daftar Akun Berhasil! Silakan Login.');
+        } catch (ValidationException $e) {
+            // Kembali dengan error validasi spesifik untuk UX yang lebih baik
+            return back()->withErrors($e->errors())->withInput();
         } catch (Exception $e) {
-             dd($e->getMessage());
-            return back()->with('error', 'Daftar Akun Gagal. Isi Form Pendaftaran Dengan Benar!!');
+            // Kembali dengan pesan error yang lebih umum untuk keamanan
+            return back()->with('error', 'Daftar Akun Gagal. Pastikan semua data terisi dengan benar.')->withInput();
         }
     }
+
     private function generateUserId()
     {
         $lastUser = User::orderBy('id', 'desc')->first();
-        $lastId = $lastUser ? intval(substr($lastUser->id, 1)) : 0; // Remove 'U' and get the numeric part
-        return 'U' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT); // Add leading zeros to make it 'U000x'
+        $lastId = $lastUser ? intval(substr($lastUser->id, 1)) : 0;
+        return 'U' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
     }
 
 
@@ -108,15 +109,6 @@ class AuthController extends Controller
 
     function logout()
     {
-        $timeZone = new CarbonTimeZone('Asia/Jakarta');
-        $dateNow = Carbon::now($timeZone);
-        // Activity_Admin::create([
-        //     'nama' => Auth::user()->nama,
-        //     'keterangan' => 'Log Out',
-        //     'no_transaksi' => 'Log Out',
-        //     'tanggal' => $dateNow
-        // ]);
-
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
