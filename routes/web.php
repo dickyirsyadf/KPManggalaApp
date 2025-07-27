@@ -125,7 +125,7 @@ Route::middleware(['auth', 'id_hakakses:2'])->group(function () {
             Route::post('/kontrak/selesaikan/{id_kontrak}', 'selesaikan')->name('kontrak.selesaikan');
         });
         Route::controller(AbsensiController::class)->group(function () {
-            Route::get('/absensi', 'indexKaryawan')->name('absensi.index');
+            Route::get('/absensi', 'indexKaryawan')->name('karyawan.absensi.index');
             Route::post('/absensi/process', 'process')->name('absensi.process');
             Route::put('/absensi/update','update')->name('absensi.update');
             Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');

@@ -155,20 +155,37 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="stats-icon blue mb-2 me-3"><i class="iconly-boldUser"></i></div>
-                                <div>
-                                    <h6 class="text-muted font-semibold">Status Absensi Hari Ini</h6>
-                                    @if ($absensiStatus == 'belum_absen')
-                                        <h6 class="font-extrabold text-danger mb-0">Belum Absen Masuk</h6>
-                                        <a href="{{ route('absensi.index') }}" class="btn btn-sm btn-danger mt-2">Absen Sekarang</a>
-                                    @elseif ($absensiStatus == 'sudah_masuk')
-                                        <h6 class="font-extrabold text-info mb-0">Anda Sedang Bekerja</h6>
-                                        <p class="text-muted mb-0">Masuk: {{ \Carbon\Carbon::parse($absensiHariIni->jam_masuk)->format('H:i') }}</p>
-                                        <a href="{{ route('absensi.index') }}" class="btn btn-sm btn-info mt-2">Absen Pulang</a>
-                                    @elseif ($absensiStatus == 'sudah_pulang')
-                                        <h6 class="font-extrabold text-success mb-0">Absensi Selesai</h6>
-                                        <p class="text-muted mb-0">Pulang: {{ \Carbon\Carbon::parse($absensiHariIni->jam_keluar)->format('H:i') }}</p>
-                                    @endif
-                                </div>
+                                @if(auth()->user()->id_hakakses == 1)
+                                    <div>
+                                        <h6 class="text-muted font-semibold">Status Absensi Hari Ini</h6>
+                                        @if ($absensiStatus == 'belum_absen')
+                                            <h6 class="font-extrabold text-danger mb-0">Belum Absen Masuk</h6>
+                                            <a href="{{ route('absensi.index') }}" class="btn btn-sm btn-danger mt-2">Absen Sekarang</a>
+                                        @elseif ($absensiStatus == 'sudah_masuk')
+                                            <h6 class="font-extrabold text-info mb-0">Anda Sedang Bekerja</h6>
+                                            <p class="text-muted mb-0">Masuk: {{ \Carbon\Carbon::parse($absensiHariIni->jam_masuk)->format('H:i') }}</p>
+                                            <a href="{{ route('absensi.index') }}" class="btn btn-sm btn-info mt-2">Absen Pulang</a>
+                                        @elseif ($absensiStatus == 'sudah_pulang')
+                                            <h6 class="font-extrabold text-success mb-0">Absensi Selesai</h6>
+                                            <p class="text-muted mb-0">Pulang: {{ \Carbon\Carbon::parse($absensiHariIni->jam_keluar)->format('H:i') }}</p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div>
+                                        <h6 class="text-muted font-semibold">Status Absensi Hari Ini</h6>
+                                        @if ($absensiStatus == 'belum_absen')
+                                            <h6 class="font-extrabold text-danger mb-0">Belum Absen Masuk</h6>
+                                            <a href="{{ route('karyawan.absensi.index') }}" class="btn btn-sm btn-danger mt-2">Absen Sekarang</a>
+                                        @elseif ($absensiStatus == 'sudah_masuk')
+                                            <h6 class="font-extrabold text-info mb-0">Anda Sedang Bekerja</h6>
+                                            <p class="text-muted mb-0">Masuk: {{ \Carbon\Carbon::parse($absensiHariIni->jam_masuk)->format('H:i') }}</p>
+                                            <a href="{{ route('karyawan.absensi.index') }}" class="btn btn-sm btn-info mt-2">Absen Pulang</a>
+                                        @elseif ($absensiStatus == 'sudah_pulang')
+                                            <h6 class="font-extrabold text-success mb-0">Absensi Selesai</h6>
+                                            <p class="text-muted mb-0">Pulang: {{ \Carbon\Carbon::parse($absensiHariIni->jam_keluar)->format('H:i') }}</p>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
