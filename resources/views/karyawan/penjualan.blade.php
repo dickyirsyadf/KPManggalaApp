@@ -171,7 +171,7 @@
                         <h4 class="card-title-custom"><i class="bi bi-box-seam-fill me-2"></i>Produk Tersedia</h4>
                     </div>
                     <div class="card-body">
-                        <table class="table table-striped table-bordered" id="barangTable">
+                        <table class="table table-striped table-bordered" id="barangTable" style="width: 100%">
                             <thead>
                                 <tr>
                                     <th>Nama Barang</th>
