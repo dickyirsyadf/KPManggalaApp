@@ -93,20 +93,24 @@
                 {{-- Tombol Tambah Karyawan bisa ditambahkan di sini jika diperlukan --}}
             </div>
             <div class="card-body">
-                <table class="table table-striped" id="userTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Karyawan</th>
-                            <th>Jabatan</th>
-                            <th>Email</th>
-                            <th>No Handphone</th>
-                            <th>Hak Akses</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-striped" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Karyawan</th>
+                                <th>Jabatan</th>
+                                <th>Email</th>
+                                <th>No Handphone</th>
+                                <th>Hak Akses</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- Data akan diisi oleh DataTables --}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>

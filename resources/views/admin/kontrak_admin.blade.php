@@ -20,65 +20,72 @@
         <div class="card">
             <div class="card-header"><h4 class="card-title-custom">Daftar Pengajuan Kontrak Iklan</h4></div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="kontrakAdminTable">
-                        <thead>
-                            <tr>
-                                <th>ID Kontrak</th>
-                                <th>Klien</th>
-                                <th>Biaya</th>
-                                <th>Diajukan Oleh</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($semuaKontrak as $kontrak)
-                            <tr>
-                                <td>{{ $kontrak->id_kontrak }}</td>
-                                <td>{{ $kontrak->nama_client }}</td>
-                                <td>Rp {{ number_format($kontrak->biaya_iklan, 0, ',', '.') }}</td>
-                                <td>{{ $kontrak->diajukan_oleh }}</td>
-                                <td>
-                                    @php
-                                        $statusClass = [
-                                            'Dalam Pengajuan' => 'bg-light-warning',
-                                            'Diterima' => 'bg-light-success',
-                                            'Ditolak' => 'bg-light-danger',
-                                            'Sedang Tayang' => 'bg-light-info',
-                                            'Kontrak Selesai' => 'bg-light-secondary',
-                                        ][$kontrak->status] ?? 'bg-light-primary';
-                                    @endphp
-                                    <span class="badge badge-status {{ $statusClass }}">{{ $kontrak->status }}</span>
-                                </td>
-                                <td>
-                                    @if($kontrak->status == 'Dalam Pengajuan')
-                                        <form action="{{ route('kontrak.updateStatus', $kontrak->id_kontrak) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="status" value="Diterima">
-                                            <button type="submit" class="btn btn-sm btn-success">Setujui</button>
-                                        </form>
-                                        <form action="{{ route('kontrak.updateStatus', $kontrak->id_kontrak) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="status" value="Ditolak">
-                                            <button type="submit" class="btn btn-sm btn-danger">Tolak</button>
-                                        </form>
-                                    @else
-                                        Dikonfirmasi oleh {{ $kontrak->dikonfirmasi_oleh ?? '-' }}
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="6" class="text-center text-muted">Tidak ada pengajuan kontrak.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                @if($semuaKontrak->isNotEmpty())
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="kontrakAdminTable">
+                            <thead>
+                                <tr>
+                                    <th>ID Kontrak</th>
+                                    <th>Klien</th>
+                                    <th>Biaya</th>
+                                    <th>Diajukan Oleh</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($semuaKontrak as $kontrak)
+                                <tr>
+                                    <td>{{ $kontrak->id_kontrak }}</td>
+                                    <td>{{ $kontrak->nama_client }}</td>
+                                    <td>Rp {{ number_format($kontrak->biaya_iklan, 0, ',', '.') }}</td>
+                                    <td>{{ $kontrak->diajukan_oleh }}</td>
+                                    <td>
+                                        @php
+                                            $statusClass = [
+                                                'Dalam Pengajuan' => 'bg-light-warning',
+                                                'Diterima' => 'bg-light-success',
+                                                'Ditolak' => 'bg-light-danger',
+                                                'Sedang Tayang' => 'bg-light-info',
+                                                'Kontrak Selesai' => 'bg-light-secondary',
+                                            ][$kontrak->status] ?? 'bg-light-primary';
+                                        @endphp
+                                        <span class="badge badge-status {{ $statusClass }}">{{ $kontrak->status }}</span>
+                                    </td>
+                                    <td>
+                                        @if($kontrak->status == 'Dalam Pengajuan')
+                                            <form action="{{ route('kontrak.updateStatus', $kontrak->id_kontrak) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="status" value="Diterima">
+                                                <button type="submit" class="btn btn-sm btn-success">Setujui</button>
+                                            </form>
+                                            <form action="{{ route('kontrak.updateStatus', $kontrak->id_kontrak) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="status" value="Ditolak">
+                                                <button type="submit" class="btn btn-sm btn-danger">Tolak</button>
+                                            </form>
+                                        @else
+                                            Dikonfirmasi oleh {{ $kontrak->dikonfirmasi_oleh ?? '-' }}
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    {{-- Tampilkan pesan jika tidak ada data --}}
+                    <div class="alert alert-secondary text-center">
+                        <p class="mb-0">Tidak ada pengajuan kontrak saat ini.</p>
+                    </div>
+                @endif
             </div>
         </div>
     </section>
 </div>
 
+
+@if($semuaKontrak->isNotEmpty())
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
@@ -89,4 +96,6 @@
         });
     });
 </script>
+@endif
+
 @endsection

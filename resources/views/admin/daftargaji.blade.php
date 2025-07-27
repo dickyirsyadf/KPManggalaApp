@@ -95,18 +95,22 @@
                 </button>
             </div>
             <div class="card-body">
-                <table class="table table-striped" id="gajiTable">
-                    <thead>
-                        <tr>
-                            <th>ID Karyawan</th>
-                            <th>Nama</th>
-                            <th>Jabatan</th>
-                            <th>Gaji Pokok</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-striped" id="gajiTable">
+                        <thead>
+                            <tr>
+                                <th>ID Karyawan</th>
+                                <th>Nama</th>
+                                <th>Jabatan</th>
+                                <th>Gaji Pokok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- Data akan diisi oleh DataTables --}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>

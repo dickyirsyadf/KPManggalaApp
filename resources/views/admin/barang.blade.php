@@ -95,20 +95,24 @@
                 </button>
             </div>
             <div class="card-body">
-                <table class="table table-striped" id="barangTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Barang</th>
-                            <th>Deskripsi</th>
-                            <th>Stok</th>
-                            <th>Harga Jual</th>
-                            <th>Harga Modal</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <div class="table-responsive" style="min-height:250px;">
+                    <table class="table table-striped table-bordered" id="barangTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Barang</th>
+                                <th>Deskripsi</th>
+                                <th>Stok</th>
+                                <th>Harga Jual</th>
+                                <th>Harga Modal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- Data akan diisi oleh DataTables --}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>

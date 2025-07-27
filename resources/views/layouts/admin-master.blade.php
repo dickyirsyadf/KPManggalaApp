@@ -73,6 +73,7 @@
     </div>
 
     {{-- Theme --}}
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const adjustCardWidths = () => {
@@ -187,8 +188,8 @@
     {{-- Assets --}}
     <script src="{{asset('assets/static/js/initTheme.js')}}"></script>
     <script src="{{asset('assets/static/js/components/dark.js')}}"></script>
-    <script src="{{asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')}}"></script>
-    <script src="{{asset('assets/compiled/js/app.js')}}"></script>
+    <script src="{{asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')}}" defer></script>
+    <script src="{{asset('assets/compiled/js/app.js')}}" defer></script>
     <script src="{{asset('assets/extensions/sweetalert2/sweetalert2.min.js')}}"></script>
     <script src="{{asset('assets/extensions/toastify-js/src/toastify.js')}}"></script>
     <script src="{{asset('assets/extensions/flatpickr/flatpickr.min.js')}}"></script>
@@ -212,6 +213,12 @@
     </script>
     @endif
     {{-- Fullscreen --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize perfect-scrollbar here
+            const ps = new PerfectScrollbar('.sidebar-wrapper');
+        });
+    </script>
     <script>
         function toggleFullscreen() {
             const elem = document.documentElement;
