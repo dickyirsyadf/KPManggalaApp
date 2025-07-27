@@ -96,7 +96,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive" style="min-height:250px;">
-                    <table class="table table-striped table-bordered" id="barangTable">
+                    <table class="table table-striped table-bordered" id="barangTable" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>#</th>

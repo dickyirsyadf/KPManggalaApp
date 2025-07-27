@@ -94,7 +94,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped" id="userTable">
+                    <table class="table table-striped" id="userTable" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>#</th>
