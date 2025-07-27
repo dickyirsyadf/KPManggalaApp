@@ -132,7 +132,7 @@ Route::middleware(['auth', 'id_hakakses:2'])->group(function () {
             Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus');
         });
         Route::controller(DashboardController::class)->group(function () {
-            Route::get('/dashboard', 'index')->name('admin.dashboard');
+            Route::get('/dashboard', 'index')->name('karyawan.dashboard');
         });
     });
 });
