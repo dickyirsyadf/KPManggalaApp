@@ -30,7 +30,7 @@ class PreorderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin.preorder_staff', [
+        return view('karyawan.preorder_staff', [
             'menu' => 'Preorder Barang',
             'barangHampirHabis' => $barangHampirHabis,
             'riwayatPreorder' => $riwayatPreorder,

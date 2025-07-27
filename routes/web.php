@@ -63,24 +63,13 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::delete('/karyawan/{id}','delete')->name('karyawan.delete');
 
         });
-        Route::controller(PenjualanController::class)->group(function (){
-            Route::get('penjualan','index')->name('penjualan.index');
-            Route::post('/penjualan', 'store')->name('penjualan.store');
-        });
         Route::controller(PreorderController::class)->group(function () {
-            Route::get('/preorder-staff', 'indexStaff')->name('preorder.staff');
-            Route::post('/preorder-staff', 'store')->name('preorder.store');
             Route::get('/preorder-admin', 'indexAdmin')->name('preorder.admin');
             Route::post('/preorder/update-status/{id}', 'updateStatus')->name('preorder.updateStatus');
-            Route::post('/preorder/selesaikan/{id}', 'selesaikan')->name('preorder.selesaikan');
         });
         Route::controller(KontrakIklanController::class)->group(function () {
-            Route::get('/kontrak-staff', 'indexStaff')->name('kontrak.staff');
-            Route::post('/kontrak-staff', 'store')->name('kontrak.store');
             Route::get('/kontrak-admin', 'indexAdmin')->name('kontrak.admin');
             Route::post('/kontrak/update-status/{id_kontrak}', 'updateStatus')->name('kontrak.updateStatus');
-            Route::post('/kontrak/update-tayang/{id_kontrak}', 'updateTayang')->name('kontrak.updateTayang');
-            Route::post('/kontrak/selesaikan/{id_kontrak}', 'selesaikan')->name('kontrak.selesaikan');
         });
         Route::controller(DaftarGajiController::class)->group(function () {
             Route::get('/daftargaji', 'index')->name('daftargaji.index');
@@ -91,7 +80,7 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
             Route::get('/daftargaji/{id}', 'show')->name('daftargaji.show');
         });
         Route::controller(AbsensiController::class)->group(function () {
-            Route::get('/absensi', 'index')->name('absensi.index');
+            Route::get('/absensi', 'indexAdmin')->name('absensi.index');
             Route::post('/absensi/process', 'process')->name('absensi.process');
             Route::put('/absensi/update','update')->name('absensi.update');
             Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');
@@ -108,6 +97,35 @@ Route::middleware(['auth', 'id_hakakses:1'])->group(function () {
         Route::controller(LaporanController::class)->group(function () {
             Route::get('laporan-keuangan', 'laporan')->name('laporan.index');
             Route::get('laporan-keuangan/export','exportLaporan')->name('laporan.export');
+        });
+        Route::controller(DashboardController::class)->group(function () {
+            Route::get('/dashboard', 'index')->name('admin.dashboard');
+        });
+    });
+});
+Route::middleware(['auth', 'id_hakakses:2'])->group(function () {
+    Route::prefix('karyawan')->group(function ()  {
+        Route::controller(PenjualanController::class)->group(function (){
+            Route::get('penjualan','index')->name('penjualan.index');
+            Route::post('/penjualan', 'store')->name('penjualan.store');
+        });
+        Route::controller(PreorderController::class)->group(function () {
+            Route::get('/preorder-staff', 'indexStaff')->name('preorder.staff');
+            Route::post('/preorder-staff', 'store')->name('preorder.store');
+            Route::post('/preorder/selesaikan/{id}', 'selesaikan')->name('preorder.selesaikan');
+        });
+        Route::controller(KontrakIklanController::class)->group(function () {
+            Route::get('/kontrak-staff', 'indexStaff')->name('kontrak.staff');
+            Route::post('/kontrak-staff', 'store')->name('kontrak.store');
+            Route::post('/kontrak/update-tayang/{id_kontrak}', 'updateTayang')->name('kontrak.updateTayang');
+            Route::post('/kontrak/selesaikan/{id_kontrak}', 'selesaikan')->name('kontrak.selesaikan');
+        });
+        Route::controller(AbsensiController::class)->group(function () {
+            Route::get('/absensi', 'indexKaryawan')->name('absensi.index');
+            Route::post('/absensi/process', 'process')->name('absensi.process');
+            Route::put('/absensi/update','update')->name('absensi.update');
+            Route::get('/absensi/status/{user}/{tanggal}','cekStatusAbsensi')->name('absensi.status');
+            Route::post('/absensi/status', 'recordStatus')->name('absensi.recordStatus');
         });
         Route::controller(DashboardController::class)->group(function () {
             Route::get('/dashboard', 'index')->name('admin.dashboard');

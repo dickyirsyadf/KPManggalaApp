@@ -12,13 +12,21 @@ use Illuminate\Validation\Rule;
 
 class AbsensiController extends Controller
 {
-    public function index()
+    public function indexAdmin()
     {
         $users = User::all();
         $absensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
         $data = ['menu' => 'Absensi'];
 
         return view('admin.absensi', compact('users', 'absensi', 'data'));
+    }
+    public function indexKaryawan()
+    {
+        $users = User::all();
+        $absensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
+        $data = ['menu' => 'Absensi'];
+
+        return view('karyawan.absensi', compact('users', 'absensi', 'data'));
     }
 
     /**

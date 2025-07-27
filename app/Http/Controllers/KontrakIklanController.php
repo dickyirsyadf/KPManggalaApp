@@ -23,7 +23,7 @@ class KontrakIklanController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin.kontrak_staff', [
+        return view('karyawan.kontrak_staff', [
             'menu' => 'Kontrak Iklan',
             'riwayatKontrak' => $riwayatKontrak,
         ]);

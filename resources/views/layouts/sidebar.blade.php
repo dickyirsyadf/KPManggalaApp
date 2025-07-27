@@ -21,7 +21,7 @@
         <div class="sidebar-menu">
             <ul class="menu">
                 <li class="sidebar-title">Menu Utama</li>
-                <li class="sidebar-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                <li class="sidebar-item {{ request()->is('dashboard') ? 'active' : '' }}">
                     <a href="{{ url('admin/dashboard') }}" class='sidebar-link'>
                         <i class="bi bi-grid-fill"></i>
                         <span>Dashboard</span>
@@ -29,12 +29,14 @@
                 </li>
 
                 <li class="sidebar-title">Aktivitas</li>
-                <li class="sidebar-item {{ request()->is('admin/penjualan') ? 'active' : '' }}">
-                    <a href="{{ url('admin/penjualan') }}" class='sidebar-link'>
+                @if(auth()->user()->id_hakakses == 2)
+                <li class="sidebar-item {{ request()->is('karyawan/penjualan') ? 'active' : '' }}">
+                    <a href="{{ url('karyawan/penjualan') }}" class='sidebar-link'>
                         <i class="bi bi-cart-fill"></i>
                         <span>Penjualan</span>
                     </a>
                 </li>
+                @endif
 
                 <li class="sidebar-item has-sub {{ request()->is('admin/preorder-*') ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
@@ -43,17 +45,17 @@
                     </a>
                     <ul class="submenu {{ request()->is('admin/preorder-*') ? 'active' : '' }}">
                         {{-- Menu untuk Staff (id_hakakses = 2) --}}
-                        <li class="submenu-item {{ request()->is('admin/preorder-staff') ? 'active' : '' }}">
+                        @if(auth()->user()->id_hakakses == 2)
+                        <li class="submenu-item {{ request()->is('karyawan/preorder-staff') ? 'active' : '' }}">
                             <a href="{{ route('preorder.staff') }}">Pengajuan Preorder</a>
                         </li>
-                        @if(auth()->user()->id_hakakses == 2)
                         @endif
 
                         {{-- Menu untuk Admin (id_hakakses = 1) --}}
+                        @if(auth()->user()->id_hakakses == 1)
                         <li class="submenu-item {{ request()->is('admin/preorder-admin') ? 'active' : '' }}">
                             <a href="{{ route('preorder.admin') }}">Persetujuan Preorder</a>
                         </li>
-                        @if(auth()->user()->id_hakakses == 1)
                         @endif
                     </ul>
                 </li>
@@ -64,17 +66,17 @@
                     </a>
                     <ul class="submenu {{ request()->is('admin/kontrak-*') ? 'active' : '' }}">
                         {{-- Menu untuk Staff (id_hakakses = 2) --}}
+                        @if(auth()->user()->id_hakakses == 2)
                         <li class="submenu-item {{ request()->is('admin/kontrak-staff') ? 'active' : '' }}">
                             <a href="{{ route('kontrak.staff') }}">Pengajuan Kontrak</a>
                         </li>
-                        @if(auth()->user()->id_hakakses == 2)
                         @endif
 
                         {{-- Menu untuk Admin (id_hakakses = 1) --}}
+                        @if(auth()->user()->id_hakakses == 1)
                         <li class="submenu-item {{ request()->is('admin/kontrak-admin') ? 'active' : '' }}">
                             <a href="{{ route('kontrak.admin') }}">Persetujuan Kontrak</a>
                         </li>
-                        @if(auth()->user()->id_hakakses == 1)
                         @endif
                     </ul>
                 </li>
@@ -103,13 +105,24 @@
                 @endif
 
                 <li class="sidebar-title">Manajemen</li>
+                @if(auth()->user()->id_hakakses == 1)
                 <li class="sidebar-item {{ request()->is('admin/absensi') ? 'active' : '' }}">
                     <a href="{{ url('admin/absensi') }}" class='sidebar-link'>
                         <i class="bi bi-calendar-check"></i>
                         <span>Absensi</span>
                     </a>
                 </li>
+                @endif
+                @if(auth()->user()->id_hakakses == 2)
+                <li class="sidebar-item {{ request()->is('karyawan/absensi') ? 'active' : '' }}">
+                    <a href="{{ url('karyawan/absensi') }}" class='sidebar-link'>
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Absensi</span>
+                    </a>
+                </li>
+                @endif
 
+                {{-- Menu untuk Staff --}}
                 {{-- Menu Master Data hanya untuk Admin --}}
                 @if(auth()->user()->id_hakakses == 1)
                 <li class="sidebar-item has-sub {{ request()->is('admin/barang') || request()->is('admin/karyawan') ? 'active' : '' }}">

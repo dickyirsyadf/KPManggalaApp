@@ -20,7 +20,7 @@ class PenjualanController extends Controller
         $data = [
             'menu' => 'Penjualan',
         ];
-        return view('admin.penjualan', $data);
+        return view('karyawan.penjualan', $data);
     }
 
     /**

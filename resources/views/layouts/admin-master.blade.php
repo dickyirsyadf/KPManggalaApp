@@ -45,7 +45,7 @@
 
         {{-- SIDEBAR --}}
 
-        @include('admin.layouts.sidebar')
+        @include('layouts.sidebar')
 
         {{-- END OF SIDEBAR --}}
 

@@ -1,4 +1,4 @@
-@extends('admin.layouts.admin-master')
+@extends('../layouts.admin-master')
 @section('admin-master')
 
 {{-- CSS Kustom untuk Dasbor --}}

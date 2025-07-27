@@ -79,6 +79,6 @@ class DashboardController extends Controller
             'kontrakAkanBerakhir' => $kontrakAkanBerakhir,
         ];
 
-        return view('admin.dashboard', $data);
+        return view('dashboard', $data);
     }
 }

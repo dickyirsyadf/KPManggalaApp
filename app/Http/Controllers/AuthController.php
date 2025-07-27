@@ -50,7 +50,7 @@ class AuthController extends Controller
     function registrasi()
     {
         $jabatan = Jabatan::all();
-        return view('Auth.registrasi', [
+        return view('auth.registrasi', [
             'title' => 'Daftar Akun',
             'jabatan' => $jabatan
         ]);
