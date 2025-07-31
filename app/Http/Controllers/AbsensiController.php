@@ -155,7 +155,7 @@ class AbsensiController extends Controller
             'kehadiran' => 0,
             'keterangan' => $status,
         ]);
-        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'karyawan.absensi.index';
         return redirect()->route($redirectRoute)->with('success', 'Status ' . $status . ' berhasil dicatat.');
     }
 
@@ -216,7 +216,7 @@ class AbsensiController extends Controller
             ]);
         }
 
-        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'karyawan.absensi.index';
         return redirect()->route($redirectRoute)->with('success', 'Data absensi berhasil diperbarui.');
     }
 
