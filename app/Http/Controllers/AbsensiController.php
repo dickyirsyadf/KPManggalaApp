@@ -120,7 +120,7 @@ class AbsensiController extends Controller
             'kehadiran' => null,
             'keterangan' => $currentTime->gt($batasWaktuMasuk) ? 'Terlambat' : null,
         ]);
-        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'karyawan.absensi.index';
         return redirect()->route($redirectRoute)->with('success', 'Berhasil melakukan absensi masuk.');
     }
 
