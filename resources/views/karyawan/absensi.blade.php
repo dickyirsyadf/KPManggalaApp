@@ -89,7 +89,7 @@
                     <div class="card-body">
                         {{-- Menentukan route form action berdasarkan role (admin/karyawan) --}}
                         @php
-                            $formAction = Auth::user()->id_hakakses == 1 ? route('absensi.process.admin') : route('absensi.process');
+                            $formAction = Auth::user()->id_hakakses == 1 ? route('absensi.process.admin') : route('karyawan.absensi.process');
                         @endphp
                         <form action="{{ $formAction }}" method="POST">
                             @csrf
