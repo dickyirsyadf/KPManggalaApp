@@ -143,7 +143,7 @@ class AbsensiController extends Controller
 
         $absensi->keterangan = !empty($keterangan) ? implode(', ', $keterangan) : null;
         $absensi->save();
-        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'absensi.index';
+        $redirectRoute = Auth::user()->id_hakakses == 1 ? 'absensi.index.admin' : 'karyawan.absensi.index';
         return redirect()->route($redirectRoute)->with('success', 'Berhasil melakukan absensi pulang.');
     }
 
